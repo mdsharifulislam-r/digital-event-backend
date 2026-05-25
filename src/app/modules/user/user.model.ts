@@ -1,10 +1,10 @@
 import bcrypt from 'bcrypt';
 import { StatusCodes } from 'http-status-codes';
-import { model, Schema } from 'mongoose';
+import { model, Schema, SchemaType, Types } from 'mongoose';
 import config from '../../../config';
-import { USER_ROLES } from '../../../enums/user';
+import { ORGANIZATION_TYPE, USECASE_PLATFORM, USER_ROLES } from '../../../enums/user';
 import ApiError from '../../../errors/ApiError';
-import { IUser, UserModal } from './user.interface';
+import { FaceVerificationModal, FollowerModal, IFaceVerification, IFollower, IOrganization, IUser, OrganizationModal, UserModal } from './user.interface';
 
 const userSchema = new Schema<IUser, UserModal>(
   {
@@ -38,6 +38,14 @@ const userSchema = new Schema<IUser, UserModal>(
       enum: ['active', 'delete'],
       default: 'active',
     },
+    contact: {
+      type: String,
+      default: null,
+    },
+    location: {
+      type: String,
+      default: null,
+    },
     verified: {
       type: Boolean,
       default: false,
@@ -59,8 +67,13 @@ const userSchema = new Schema<IUser, UserModal>(
       },
       select: 0,
     },
+    subscription: {
+      type: Schema.Types.ObjectId,
+      ref: 'Subscription',
+      default: null
+    }
   },
-  { timestamps: true }
+  { timestamps: true,discriminatorKey: 'role' }
 );
 
 //exist user check
@@ -99,3 +112,98 @@ userSchema.pre('save', async function (next) {
 });
 
 export const User = model<IUser, UserModal>('User', userSchema);
+
+
+const organizationSchema = new Schema<IOrganization, OrganizationModal>({
+  organization_name: {
+    type: String,
+    required: true,
+  },
+  website: {
+    type: String,
+    required: true,
+  },
+  contact_name: {
+    type: String,
+    required: true,
+  },
+  country: {
+    type: String,
+    required: true,
+  },
+  organization_type: {
+    type: String,
+    enum: Object.values(ORGANIZATION_TYPE),
+    required: true,
+  },
+  phone: {
+    type: String,
+    required: true,
+  },
+  use_case: {
+    type: String,
+    enum: Object.values(USECASE_PLATFORM),
+    required: true,
+  },
+
+})
+
+export const Organization = User.discriminator<IOrganization, OrganizationModal>('ORGANIZATION', organizationSchema);
+export const NormalUser = User.discriminator<IUser, UserModal>(USER_ROLES.USER, new Schema({}));
+export const Admin = User.discriminator<IUser, UserModal>('ADMIN', new Schema({}));
+export const SuperAdmin = User.discriminator<IUser, UserModal>('SUPER_ADMIN', new Schema({}));
+
+const faceVerificationSchema = new Schema<IFaceVerification, FaceVerificationModal>({
+  userId: {
+    type: Schema.Types.ObjectId,
+    required: true,
+    ref: 'User',
+  },
+  faceDescriptor: {
+    type: Schema.Types.Mixed,
+    required: true,
+  },
+  device_id: {
+    type: String,
+    required: true,
+  },
+})
+
+faceVerificationSchema.index({ userId: 1 });
+faceVerificationSchema.index({ device_id: 1 });
+
+export const FaceVerification = model<IFaceVerification, FaceVerificationModal>('FaceVerification', faceVerificationSchema);
+
+
+const followSchema = new Schema<IFollower, FollowerModal>({
+  follower: {
+    type: Schema.Types.ObjectId,
+    required: true,
+    ref: 'User',
+  },
+  following: {
+    type: Schema.Types.ObjectId,
+    required: true,
+    ref: 'User',
+  },
+  
+},{
+  timestamps: true,
+})
+
+followSchema.index({ follower: 1, following: 1 }, { unique: true });
+
+followSchema.statics.followUser = async (follower: Types.ObjectId, following: Types.ObjectId): Promise<IFollower> => {
+  const exist = await Follower.findOne({ follower, following });
+  if (exist) {
+    await exist.deleteOne();
+    await User.findByIdAndUpdate(follower, { $inc: { followers_count: -1 } });
+    return exist
+  }
+
+  
+  await User.findByIdAndUpdate(follower, { $inc: { followers_count: 1 } });
+  return await Follower.create({ follower, following });
+}
+
+export const Follower = model<IFollower, FollowerModal>('Follower', followSchema);

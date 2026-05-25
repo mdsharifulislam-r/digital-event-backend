@@ -1,5 +1,5 @@
-import { Model } from 'mongoose';
-import { USER_ROLES } from '../../../enums/user';
+import { Model, Types } from 'mongoose';
+import { ORGANIZATION_TYPE, USECASE_PLATFORM, USER_ROLES } from '../../../enums/user';
 
 export type IUser = {
   name: string;
@@ -11,6 +11,7 @@ export type IUser = {
   image?: string;
   status: 'active' | 'delete';
   verified: boolean;
+  subscription:Types.ObjectId;
   authentication?: {
     isResetPassword: boolean;
     oneTimeCode: number;
@@ -23,3 +24,40 @@ export type UserModal = {
   isExistUserByEmail(email: string): any;
   isMatchPassword(password: string, hashPassword: string): boolean;
 } & Model<IUser>;
+
+
+export type IOrganization = {
+  organization_name: string;
+  organization_type: ORGANIZATION_TYPE;
+  website: string;
+  country: string;
+  contact_name: string;
+  phone: string;
+  use_case : USECASE_PLATFORM,
+  followers_count: number;
+}
+
+export type OrganizationModal = {
+  isExistOrganizationById(id: string): any;
+} & Model<IOrganization>;
+
+
+export type IFaceVerification = {
+  userId: Types.ObjectId;
+  faceDescriptor: any;
+  device_id: string;
+}
+
+export type FaceVerificationModal = {
+} & Model<IFaceVerification>;
+
+
+export type IFollower={
+  follower:Types.ObjectId;
+  following:Types.ObjectId;
+}
+
+export type FollowerModal = {
+  followUser (follower: Types.ObjectId, following: Types.ObjectId): Promise<IFollower>;
+} & Model<IFollower>;
+

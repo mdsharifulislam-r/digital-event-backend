@@ -3,6 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 import { AuthService } from './auth.service';
+import { getSingleFilePath } from '../../../shared/getFilePath';
 
 const verifyEmail = catchAsync(async (req: Request, res: Response) => {
   const { ...verifyData } = req.body;
@@ -66,10 +67,39 @@ const changePassword = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const saveFaceDiscriminatorToDB = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user;
+  const { device_id } = req.body;
+  const image = getSingleFilePath(req.files, 'image');
+  const discriminator = await AuthService.saveFaceDiscriminatorToDB(user, image!, device_id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Face descriptor saved successfully',
+    data: discriminator,
+  });
+});
+
+const faceLogin = catchAsync(async (req: Request, res: Response) => {
+  const { device_id } = req.body;
+  const image = getSingleFilePath(req.files, 'image');
+  const result = await AuthService.faceLoginToDB(image!, device_id);
+
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Face login successful',
+    data: result,
+  });
+});
+
 export const AuthController = {
   verifyEmail,
   loginUser,
   forgetPassword,
   resetPassword,
   changePassword,
+  saveFaceDiscriminatorToDB,
+  faceLogin
 };

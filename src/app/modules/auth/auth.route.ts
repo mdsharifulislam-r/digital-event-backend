@@ -4,6 +4,7 @@ import auth from '../../middlewares/auth';
 import validateRequest from '../../middlewares/validateRequest';
 import { AuthController } from './auth.controller';
 import { AuthValidation } from './auth.validation';
+import fileUploadHandler from '../../middlewares/fileUploadHandler';
 const router = express.Router();
 
 router.post(
@@ -35,6 +36,21 @@ router.post(
   auth(USER_ROLES.ADMIN, USER_ROLES.USER),
   validateRequest(AuthValidation.createChangePasswordZodSchema),
   AuthController.changePassword
+);
+
+router.post(
+  '/save-face-verification',
+  auth(USER_ROLES.USER),
+  fileUploadHandler(),
+  validateRequest(AuthValidation.saveFaceDiscriminatorZodSchema),
+  AuthController.saveFaceDiscriminatorToDB
+);
+
+router.post(
+  '/face-login',
+  fileUploadHandler(),
+  validateRequest(AuthValidation.saveFaceDiscriminatorZodSchema),
+  AuthController.faceLogin
 );
 
 export const AuthRoutes = router;

@@ -41,10 +41,17 @@ const createChangePasswordZodSchema = z.object({
   }),
 });
 
+const saveFaceDiscriminatorZodSchema = z.object({
+  body: z.object({
+    device_id: z.string({ required_error: 'Device ID is required' }),
+  }),
+});
+
 export const AuthValidation = {
   createVerifyEmailZodSchema,
   createForgetPasswordZodSchema,
   createLoginZodSchema,
   createResetPasswordZodSchema,
   createChangePasswordZodSchema,
+  saveFaceDiscriminatorZodSchema
 };

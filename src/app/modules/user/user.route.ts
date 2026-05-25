@@ -30,5 +30,7 @@ router
     UserController.createUser
   );
 
+router.post("/follow", auth(USER_ROLES.USER),validateRequest(UserValidation.followUserZodSchema), UserController.followHost);
+
 router.route('/upload-file').post(fileUploadHandler(), UserController.uploadFile);
 export const UserRoutes = router;

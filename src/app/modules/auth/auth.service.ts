@@ -15,9 +15,12 @@ import {
 import cryptoToken from '../../../util/cryptoToken';
 import generateOTP from '../../../util/generateOTP';
 import { ResetToken } from '../resetToken/resetToken.model';
-import { User } from '../user/user.model';
+import { FaceVerification, User } from '../user/user.model';
 import { Response } from 'express';
 import { AuthHelper } from './auth.helper';
+import { detectFace, verifyFace } from '../../../helpers/faceVerificationHelper';
+import { sendActivity } from '../../../handlers/activityHelper';
+import { ACTIVITY_TYPE } from '../../../enums/activity';
 
 //login
 const loginUserFromDB = async (payload: ILoginData,res:Response) => {
@@ -59,7 +62,7 @@ const loginUserFromDB = async (payload: ILoginData,res:Response) => {
     config.jwt.jwt_expire_in as string
   );
 
-  return { createToken };
+  return { accessToken: createToken, role: isExistUser.role };
 };
 
 //forget password
@@ -121,6 +124,7 @@ const verifyEmailToDB = async (payload: IVerifyEmail) => {
       { _id: isExistUser._id },
       { verified: true, authentication: { oneTimeCode: null, expireAt: null } }
     );
+    sendActivity({title:"Created Account",description:"You have created an account",user:isExistUser._id,type:ACTIVITY_TYPE.USER});
     message = 'Email verify successfully';
   } else {
     await User.findOneAndUpdate(
@@ -250,10 +254,65 @@ const changePasswordToDB = async (
   await User.findOneAndUpdate({ _id: user.id }, updateData, { new: true });
 };
 
+
+const saveFaceDiscriminatorToDB = async (user: JwtPayload, face_image: string,device_id: string) => {
+  const isExistUser = await User.findById(user.id);
+  if (!isExistUser) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
+  }
+  const discriminator = await detectFace(face_image);
+  if(!discriminator){
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'No face detected in the image');
+  }
+  const existingDescriptor = await FaceVerification.findOne({ userId: user.id, device_id });
+  if(existingDescriptor){
+    await FaceVerification.findOneAndUpdate({ userId: user.id, device_id }, { faceDescriptor: discriminator });
+  }else{
+    await FaceVerification.create({ userId: user.id, faceDescriptor: discriminator, device_id });
+  }
+}
+
+const faceLoginToDB = async (face_image: string, device_id: string) => {
+  const faceVerification = await FaceVerification.findOne({ device_id });
+  if (!faceVerification) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, 'No face data found for this device');
+  }
+
+    const isMatch = await verifyFace(face_image, faceVerification.faceDescriptor);
+    if (!isMatch) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Face not matched');
+    }
+
+    const user = await User.findById(faceVerification.userId);
+    if (!user) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
+    }
+
+    if (!user.verified) {
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'Your email is not verified yet. Please verify your email first.');
+    }
+
+    if (user.status === 'delete') {
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'You don’t have permission to access this content. It looks like your account has been deactivated.'
+      );
+    }
+
+    const createToken = jwtHelper.createToken(
+      { id: user._id, role: user.role, email: user.email },
+      config.jwt.jwt_secret as Secret,
+      config.jwt.jwt_expire_in as string
+    );
+    return { accessToken: createToken, role: user.role };
+}
+
 export const AuthService = {
   verifyEmailToDB,
   loginUserFromDB,
   forgetPasswordToDB,
   resetPasswordToDB,
   changePasswordToDB,
+  saveFaceDiscriminatorToDB,
+  faceLoginToDB
 };

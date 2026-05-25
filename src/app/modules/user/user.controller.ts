@@ -62,4 +62,16 @@ const uploadFile = catchAsync(async (req: Request, res: Response) => {
   })
 });
 
-export const UserController = { createUser, getUserProfile, updateProfile, uploadFile };
+const followHost = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user;
+  const { hostId,eventId} = req.body
+  const result = await UserService.followHost(user, hostId,eventId);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Host followed successfully',
+    data: result,
+  });
+});
+
+export const UserController = { createUser, getUserProfile, updateProfile, uploadFile, followHost };

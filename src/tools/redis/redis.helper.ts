@@ -30,6 +30,8 @@ const redisGet = async (key: string, query?: Record<string, any>) => {
     return null;
   }
 
+  console.log('Cache hit for key:', `${key}:${queryString||'1'}`);
+
   return data;
 };
 

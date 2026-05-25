@@ -7,19 +7,31 @@ import { emailTemplate } from '../../../shared/emailTemplate';
 import unlinkFile from '../../../shared/unlinkFile';
 import generateOTP from '../../../util/generateOTP';
 import { IUser } from './user.interface';
-import { User } from './user.model';
+import { Follower, Organization, User } from './user.model';
 import { AuthHelper } from '../auth/auth.helper';
 import { Response } from 'express';
+import { Types } from 'mongoose';
+import { RedisHelper } from '../../../tools/redis/redis.helper';
 
-const createUserToDB = async (payload: Partial<IUser>,res:Response) => {
+const createUserToDB = async (payload: Partial<any>, res: Response) => {
   const isExist = await User.findOne({ email: payload.email });
   if (isExist) {
-    if(isExist.status === 'delete') throw new ApiError(StatusCodes.BAD_REQUEST, 'You don’t have permission to access this content.It looks like your account has been deactivated.');
-    if(!isExist.verified){
-      return await AuthHelper.unverifiedAccountHandle(payload.email!,res);
+    if (isExist.status === 'delete')
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'You don’t have permission to access this content.It looks like your account has been deactivated.',
+      );
+    if (!isExist.verified) {
+      return await AuthHelper.unverifiedAccountHandle(payload.email!, res);
     }
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Email already exist!');
-
+  }
+  if(payload.role === USER_ROLES.ORGANIZATION){
+    payload.organization_name = payload.name;
+    payload.verified = true; // Set verified to true for organization users
+  }
+  if (!payload.role) {
+    payload.role = USER_ROLES.USER;
   }
   const createUser = await User.create(payload);
   if (!createUser) {
@@ -43,14 +55,14 @@ const createUserToDB = async (payload: Partial<IUser>,res:Response) => {
   };
   await User.findOneAndUpdate(
     { _id: createUser._id },
-    { $set: { authentication } }
+    { $set: { authentication } },
   );
 
   return createUser;
 };
 
 const getUserProfileFromDB = async (
-  user: JwtPayload
+  user: JwtPayload,
 ): Promise<Partial<IUser>> => {
   const { id } = user;
   const isExistUser = await User.isExistUserById(id);
@@ -63,7 +75,7 @@ const getUserProfileFromDB = async (
 
 const updateProfileToDB = async (
   user: JwtPayload,
-  payload: Partial<IUser>
+  payload: Partial<IUser>,
 ): Promise<Partial<IUser | null>> => {
   const { id } = user;
   const isExistUser = await User.isExistUserById(id);
@@ -83,8 +95,14 @@ const updateProfileToDB = async (
   return updateDoc;
 };
 
+const followHost = async (user: JwtPayload, hostId: string,eventId:string) => {
+  await Follower.followUser(new Types.ObjectId(user.id), new Types.ObjectId(hostId));
+  await RedisHelper.keyDelete(`event:${eventId}:${user.id}:*`);
+};
+
 export const UserService = {
   createUserToDB,
   getUserProfileFromDB,
   updateProfileToDB,
+  followHost,
 };
