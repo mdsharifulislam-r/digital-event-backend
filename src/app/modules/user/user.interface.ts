@@ -11,6 +11,11 @@ export type IUser = {
   image?: string;
   status: 'active' | 'delete';
   verified: boolean;
+  isSuspended?: boolean;
+  suspendedAt?: Date;
+  suspendedReason?: string;
+  suspendedDays?: number;
+  suspendedUntil?: Date;
   subscription:Types.ObjectId;
   authentication?: {
     isResetPassword: boolean;
@@ -61,3 +66,7 @@ export type FollowerModal = {
   followUser (follower: Types.ObjectId, following: Types.ObjectId): Promise<IFollower>;
 } & Model<IFollower>;
 
+export type ISuspendPayload ={
+  days:number;
+  reason:string;
+}

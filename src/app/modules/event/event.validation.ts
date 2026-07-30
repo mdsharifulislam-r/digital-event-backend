@@ -56,6 +56,13 @@ const hostSchema = z.object({
     bio: z.string().optional(),
 });
 
+
+const artistSchema = z.object({
+  name: z.string(),
+  description: z.string(),
+  category: z.string(),
+})
+
 /* -------------------------------------------------------------------------- */
 /*                           FormData Compatible Schema                       */
 /* -------------------------------------------------------------------------- */
@@ -105,10 +112,10 @@ export const createEventFormDataSchema = z.object({
     z.array(performanceSchema).default([])
   ),
 
-  host: z.preprocess(
-    parseJSON,
-    hostSchema
-  ),
+  // host: z.preprocess(
+  //   parseJSON,
+  //   hostSchema
+  // ),
 
   vanue: objectIdSchema,
 
@@ -145,6 +152,15 @@ export type TCreateEventFormData = z.infer<
 >;
 
 
+
+const makeFavoriteZodSchema = z.object({
+  body: z.object({
+    type: z.enum(["Event" , "Recommendations","Venue","Performances"]),
+  }),
+});
+
+
 export const EventValidation = {
   createEventFormDataSchema,
+  makeFavoriteZodSchema
 };

@@ -74,4 +74,40 @@ const followHost = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-export const UserController = { createUser, getUserProfile, updateProfile, uploadFile, followHost };
+const suspendUser = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const payload = req.body;
+  const result = await UserService.suspendUser(id, payload);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'User suspended successfully',
+    data: result,
+  });
+});
+
+const getAllUsers = catchAsync(async (req: Request, res: Response) => {
+  const query = req.query;
+  const result = await UserService.getAllUsers(query);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Users retrieved successfully',
+    data: result.users,
+    pagination: result.paginationInfo,
+  });
+});
+
+const deleteAccount = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user;
+  const result = await UserService.deleteUserAccount(user, req.body.password);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Account deleted successfully',
+    data: result,
+  });
+});
+
+
+export const UserController = { createUser, getUserProfile, updateProfile, uploadFile, followHost, suspendUser, getAllUsers,deleteAccount };

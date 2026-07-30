@@ -3,26 +3,30 @@ import fs from 'fs';
 import path from 'path';
 
 export const handleChunkUpload = async (req: Request, res: Response) => {
-    const chunk = req.file;
+  try {
+      const chunk = req.file;
+  
     const { originalname, chunkIndex, totalChunks } = req.body;
     const uploadDir = path.join(__dirname, '../../uploads/video');
     const filePath = path.join(uploadDir, originalname);
 
     if (!fs.existsSync(uploadDir)) {
-        fs.mkdirSync(uploadDir);
+        fs.mkdirSync(uploadDir, { recursive: true });
     }
 
-    fs.appendFileSync(filePath, fs.readFileSync(chunk?.path as string));
-
-    fs.unlinkSync(chunk?.path as string);
-
-    if (chunk) {
-        if (Number(chunkIndex) + 1 === Number(totalChunks)) {
-            res.json(`/${originalname}`);
-        } else {
-            res.json({ status: 'chunkReceived', message: 'Chunk received!' });
-        }
-    } else {
-        res.status(400).json({ status: 'error', message: 'No chunk received' });
+    if (!chunk || !chunk.buffer) {
+        return res.status(400).json({ status: 'error', message: 'No chunk received' });
     }
+
+    fs.appendFileSync(filePath, chunk.buffer);
+
+    if (Number(chunkIndex) + 1 === Number(totalChunks)) {
+        return res.json(`/video/${originalname}`);
+    }
+
+    res.json({ status: 'chunkReceived', message: 'Chunk received!' });
+  } catch (error) {
+    console.log(error);
+    
+  }
 };

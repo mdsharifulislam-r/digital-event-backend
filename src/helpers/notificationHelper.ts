@@ -3,6 +3,7 @@ import { INotification } from "../app/modules/notification/notification.interfac
 import { Notification } from "../app/modules/notification/notification.model";
 import { User } from "../app/modules/user/user.model";
 import { USER_ROLES } from "../enums/user";
+import { kafkaProducer } from "../tools/kafka/kafka-producers/kafka.producer";
 
 export const sendNotifications = async (
   data: INotification,
@@ -43,3 +44,9 @@ export const sendNotificationsAdmin = async (
 
 
 
+export const sendNotificationQueue = async (data: INotification) => {
+  await kafkaProducer.sendMessage("utils", {
+    type: "notification",
+    data,
+  });
+};

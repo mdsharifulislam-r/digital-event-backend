@@ -52,9 +52,10 @@ const updatePackageToDB = async (id:Types.ObjectId,payload:Partial<IPackage>,use
     }
 
     if(payload?.priceMonthly!>=0 &&payload.priceMonthly!==plan.priceMonthly){
+        console.log("update price",Math.round((payload.priceMonthly||0) * 100));
         const newPrice = await stripe.prices.create({
             product: plan.product,
-            unit_amount: Math.round(payload?.priceMonthly||0 * 100),
+            unit_amount: Math.round((payload.priceMonthly||0) * 100),
             currency: 'usd',
             recurring:{
                 interval:"month"

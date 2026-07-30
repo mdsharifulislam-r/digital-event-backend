@@ -58,4 +58,10 @@ router.route("/subscribed-users")
   SubscriptionController.getSubscribersUsers
 )
 
+router.route("/cancel/:id")
+.delete(
+  auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+  SubscriptionController.cancelSubscription
+)
+
 export const SubscriptionRoutes = router;

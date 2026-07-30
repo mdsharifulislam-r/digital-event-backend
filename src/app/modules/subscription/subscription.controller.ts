@@ -135,6 +135,18 @@ const renewSubscription = catchAsync(async (req: Request, res: Response) => {
 sendResponse(res, response);
 });
 
+
+const cancelSubscription = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  await SubscriptionService.cancelSubscription(id);
+  const response = {
+    success: true,
+    message: "Subscription cancelled successfully",
+    statusCode: 200,
+  };
+sendResponse(res, response);
+});
+
 export const SubscriptionController = {
   createSubsciption,
   demoSubscription,
@@ -145,5 +157,6 @@ export const SubscriptionController = {
   getSubscriptionDetailsById,
   getSubscribersUsers,
   transactionByOtp,
-  renewSubscription
+  renewSubscription,
+  cancelSubscription
 };

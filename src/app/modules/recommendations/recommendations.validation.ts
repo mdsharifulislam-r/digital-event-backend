@@ -50,7 +50,14 @@ const updateRecommendationSchema = z.object({
 })
 
 
+const getBulkRecommendationSchema = z.object({
+    body: z.object({
+        ids: z.array(z.string())
+    })
+})
+
 export const RecommendationsValidations = {
     createRecommendationSchema,
-    updateRecommendationSchema
+    updateRecommendationSchema,
+    getBulkRecommendationSchema
 };

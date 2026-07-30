@@ -11,6 +11,11 @@ import { SubscriptionRoutes } from '../app/modules/subscription/subscription.rou
 import { AddonRoutes } from '../app/modules/addon/addon.route';
 import { NotificationRoutes } from '../app/modules/notification/notification.routes';
 import { ActivityRoutes } from '../app/modules/activity/activity.route';
+import { AdRoutes } from '../app/modules/ad/ad.route';
+import { DashboardRoutes } from '../app/modules/dashboard/dashboard.route';
+import { TransactionRoutes } from '../app/modules/transaction/transaction.route';
+import { TicketRoutes } from '../app/modules/ticket/ticket.route';
+import { ArtistRoutes } from '../app/modules/artist/artist.route';
 const router = express.Router();
 
 const apiRoutes = [
@@ -61,6 +66,26 @@ const apiRoutes = [
   {
     path: '/activity',
     route:ActivityRoutes ,
+  },
+  {
+    path: '/ads',
+    route:AdRoutes ,
+  },
+  {
+    path: '/dashboard',
+    route:DashboardRoutes
+  },
+  {
+    path:"/transaction",
+    route:TransactionRoutes
+  },
+  {
+    path:"/ticket",
+    route:TicketRoutes
+  },
+  {
+    path:"/artist",
+    route:ArtistRoutes
   }
 ];
 

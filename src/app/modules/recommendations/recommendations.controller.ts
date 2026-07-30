@@ -72,10 +72,22 @@ const getAllRecommendations = catchAsync(async (req: Request, res: Response, nex
 })
 
 
+const getBulkRecommendations = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const body = req.body;
+    const result = await RecommendationsServices.getBulkRecommendations(body?.ids as string[]||[]);
+    sendResponse(res, {
+         success: true,
+         statusCode: StatusCodes.OK,
+         message: 'Recommendations retrieved successfully',
+         data: result,
+    });
+})
+
 export const RecommendationsController = {
     createRecommendation,
     getRecommendationById,
     updateRecommendation,
     deleteRecommendation,
-    getAllRecommendations
+    getAllRecommendations,
+    getBulkRecommendations
 };

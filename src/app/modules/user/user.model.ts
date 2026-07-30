@@ -71,7 +71,27 @@ const userSchema = new Schema<IUser, UserModal>(
       type: Schema.Types.ObjectId,
       ref: 'Subscription',
       default: null
-    }
+    },
+    isSuspended: {
+      type: Boolean,
+      default: false,
+    },
+    suspendedAt: {
+      type: Date,
+      default: null,
+    },
+    suspendedReason: {
+      type: String,
+      default: null,
+    },
+    suspendedDays: {
+      type: Number,
+      default: null,
+    },
+    suspendedUntil: {
+      type: Date,
+      default: null,
+    },
   },
   { timestamps: true,discriminatorKey: 'role' }
 );

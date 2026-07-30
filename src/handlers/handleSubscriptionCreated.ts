@@ -7,7 +7,7 @@ import { User } from '../app/modules/user/user.model';
 import { Subscription } from '../app/modules/subscription/subscription.model';
 import { RedisHelper } from '../tools/redis/redis.helper';
 import { Transaction } from '../app/modules/transaction/transaction.model';
-import { TRANSACTION_TYPE } from '../enums/transaction';
+import { TRANSACTION_PAYMENT_TYPE, TRANSACTION_STATUS, TRANSACTION_TYPE } from '../enums/transaction';
 import { sendNotifications, sendNotificationsAdmin } from '../helpers/notificationHelper';
 
 export const handleSubscriptionCreated = async (event: Stripe.Subscription) => {
@@ -90,6 +90,10 @@ export const handleSubscriptionCreated = async (event: Stripe.Subscription) => {
       txId: subscription.id,
       name: packageData.label,
       modules: packageData.modules,
+      vanues: packageData?.vanues,
+      programmes: packageData?.programmes,
+      is_proggramme_sell: packageData?.is_proggramme_sell,
+      minimum_programme_price: packageData?.minimum_programme_price
     });
 
     await User.findByIdAndUpdate(
@@ -105,8 +109,8 @@ export const handleSubscriptionCreated = async (event: Stripe.Subscription) => {
             user: user._id,
             title: `Purchase for ${packageData.label}'s programme`,
             type: TRANSACTION_TYPE.SUBSCRIPTION,
-            payment_status: 'CREDIT',
-            status: 'COMPLETED',
+            payment_status: TRANSACTION_PAYMENT_TYPE.CREDIT,
+            status: TRANSACTION_STATUS.COMPLETED,
             proggramme: newSubscription._id,
             platform_charge: packageData.priceMonthly,
         }),

@@ -354,7 +354,15 @@ export interface IProgrammes {
   created_at: string;
   updated_at: string;
   published_at?: string;
+  clicks: number;
+  views: number;
 }
 
 export type ProgrammesModel = Model<IProgrammes>;
+
+
+export interface IProgrammesAnalytics {
+  ids: string[];
+  date_range:"last7Days" | "last30Days" | "thisYear";
+}
  

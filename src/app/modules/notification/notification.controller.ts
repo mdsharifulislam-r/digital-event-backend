@@ -4,6 +4,7 @@ import sendResponse from "../../../shared/sendResponse";
 import { StatusCodes } from "http-status-codes";
 import { NotificationService } from "./notification.service";
 import { JwtHeader } from "jsonwebtoken";
+import { kafkaProducer } from "../../../tools/kafka/kafka-producers/kafka.producer";
 
 // single one update notification
 const updateNotificationById = catchAsync(
@@ -51,7 +52,13 @@ const markAllNotification = catchAsync(async (req: Request, res: Response) => {
 
 const sendPushNotification = catchAsync(async (req: Request, res: Response) => {
   const user = (req.user as any) as JwtHeader;
-  setImmediate(()=>NotificationService.sendPushNotification(req.body, user))
+  await kafkaProducer.sendMessage("utils", {
+    type: "push-notification",
+    data: {
+      payload: req.body,
+      user,
+    },
+  })
   sendResponse(res, {
     statusCode: StatusCodes.OK,
     success: true,

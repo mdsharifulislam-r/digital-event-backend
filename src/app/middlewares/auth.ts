@@ -9,10 +9,18 @@ const auth =
   (...roles: string[]) =>
   async (req: Request, res: Response, next: NextFunction) => {
     try {
+      const token = req.query?.token as string;
+      if (token) {
+        const verifyUser = jwtHelper.verifyToken(token, config.jwt.jwt_secret!);
+        req.user = verifyUser;
+        next();
+        return;
+      }
       const tokenWithBearer = req.headers.authorization;
       if (!tokenWithBearer) {
         throw new ApiError(StatusCodes.UNAUTHORIZED, 'You are not authorized');
       }
+
 
       if (tokenWithBearer && tokenWithBearer.startsWith('Bearer')) {
         const token = tokenWithBearer.split(' ')[1];

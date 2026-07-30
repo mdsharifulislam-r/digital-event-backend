@@ -28,7 +28,7 @@ const createVanue = catchAsync(async (req: Request, res: Response, next: NextFun
 
 const getVanueById = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const id = req.params.id;
-    const result = await VanueServices.getVanueById(id);
+    const result = await VanueServices.getVanueById(id, req.user as any);
     sendResponse(res, {
         success: true,
         statusCode: StatusCodes.OK,

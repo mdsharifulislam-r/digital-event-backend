@@ -14,6 +14,10 @@ export type IPackage = {
   color: string; // tailwind hex
   priceMonthly: number;
   features: string[];
+  vanues: number;
+  programmes: number;
+  is_proggramme_sell: boolean;
+  minimum_programme_price?: number;
   recommended?: boolean;
 };
 

@@ -11,6 +11,7 @@ import requestIp from 'request-ip';
 import { handleChunkUpload } from './helpers/handleChunkUpload';
 import { fileStreamHandler } from './helpers/fileStreamingHelper';
 import { handleStripeWebhook } from './webhooks/handleStripeWebhook';
+import multer from 'multer';
 const app = express();
 app.post("/api/stripe/webhook",express.raw({type:"application/json"}),handleStripeWebhook); /// stripe webhook
 const limiter = rateLimit({
@@ -28,6 +29,8 @@ const limiter = rateLimit({
         throw new ApiError(options?.statusCode, `Rate limit exceeded. Try again in ${options.windowMs / 60000} minutes.`);
     }
 });
+
+const upload = multer();
 
 app.use(session({
     secret: "your_secret_key",
@@ -50,7 +53,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/files/:folder/:file",fileStreamHandler);
 // app.use(express.static('uploads'));
 //router
-app.post('/api/v1/upload/chunk', handleChunkUpload);
+app.post('/api/v1/upload/chunk',upload.single('chunk'), handleChunkUpload);
 app.use('/api/v1', router);
 
 

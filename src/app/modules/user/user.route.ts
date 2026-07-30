@@ -9,9 +9,9 @@ const router = express.Router();
 
 router
   .route('/profile')
-  .get(auth(USER_ROLES.ADMIN, USER_ROLES.USER), UserController.getUserProfile)
+  .get(auth(), UserController.getUserProfile)
   .patch(
-    auth(USER_ROLES.SUPER_ADMIN, USER_ROLES.ADMIN, USER_ROLES.USER),
+    auth(),
     fileUploadHandler(),
     (req: Request, res: Response, next: NextFunction) => {
       if (req.body.data) {
@@ -28,9 +28,14 @@ router
   .post(
     validateRequest(UserValidation.createUserZodSchema),
     UserController.createUser
-  );
+  )
+  .get(auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN), UserController.getAllUsers);
 
 router.post("/follow", auth(USER_ROLES.USER),validateRequest(UserValidation.followUserZodSchema), UserController.followHost);
 
+router.post("/suspend/:id", auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN), validateRequest(UserValidation.suspendUserZodSchema), UserController.suspendUser);
+
 router.route('/upload-file').post(fileUploadHandler(), UserController.uploadFile);
+
+router.delete('/delete-account', auth(),validateRequest(UserValidation.deleteAccountZodSchema) ,UserController.deleteAccount);
 export const UserRoutes = router;

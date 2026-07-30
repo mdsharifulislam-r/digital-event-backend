@@ -70,6 +70,18 @@ export const createPackageZodSchema = z.object({
   recommended: z.boolean({
     invalid_type_error: 'Recommended must be a boolean',
   }).optional(),
+  vanues: z.number({
+    required_error: 'Vanues is required',
+    invalid_type_error: 'Vanues must be a number',
+  }),
+  programmes: z.number({
+    required_error: 'Programmes is required',
+    invalid_type_error: 'Programmes must be a number',
+  }),
+  is_proggramme_sell: z.boolean({
+    required_error: 'is_proggramme_sell is required',
+    invalid_type_error: 'is_proggramme_sell must be a boolean',
+  })
 }),
 });
 

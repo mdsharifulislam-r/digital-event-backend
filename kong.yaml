@@ -18,3 +18,174 @@ services:
         protocols:
           - http
           - https
+  - name: activity-service
+    url: http://activity-service:5863/api/v1/activity
+    routes:
+      - name: activity-route
+        paths:
+          - /api/v1/activity
+        protocols:
+          - http
+          - https
+  - name: ad-service
+    url: http://ad-service:5536/api/v1/ad
+    routes:
+      - name: ad-route
+        paths:
+          - /api/v1/ad
+        protocols:
+          - http
+          - https
+  - name: addon-service
+    url: http://addon-service:5618/api/v1/addon
+    routes:
+      - name: addon-route
+        paths:
+          - /api/v1/addon
+        protocols:
+          - http
+          - https
+  - name: artist-service
+    url: http://artist-service:5125/api/v1/artist
+    routes:
+      - name: artist-route
+        paths:
+          - /api/v1/artist
+        protocols:
+          - http
+          - https
+  - name: auth-service
+    url: http://auth-service:5413/api/v1/auth
+    routes:
+      - name: auth-route
+        paths:
+          - /api/v1/auth
+        protocols:
+          - http
+          - https
+  - name: booking-service
+    url: http://booking-service:5103/api/v1/booking
+    routes:
+      - name: booking-route
+        paths:
+          - /api/v1/booking
+        protocols:
+          - http
+          - https
+  - name: dashboard-service
+    url: http://dashboard-service:5858/api/v1/dashboard
+    routes:
+      - name: dashboard-route
+        paths:
+          - /api/v1/dashboard
+        protocols:
+          - http
+          - https
+  - name: event-service
+    url: http://event-service:5267/api/v1/event
+    routes:
+      - name: event-route
+        paths:
+          - /api/v1/event
+        protocols:
+          - http
+          - https
+  - name: faq-service
+    url: http://faq-service:5900/api/v1/faq
+    routes:
+      - name: faq-route
+        paths:
+          - /api/v1/faq
+        protocols:
+          - http
+          - https
+  - name: notification-service
+    url: http://notification-service:5929/api/v1/notification
+    routes:
+      - name: notification-route
+        paths:
+          - /api/v1/notification
+        protocols:
+          - http
+          - https
+  - name: package-service
+    url: http://package-service:5840/api/v1/package
+    routes:
+      - name: package-route
+        paths:
+          - /api/v1/package
+        protocols:
+          - http
+          - https
+  - name: programmes-service
+    url: http://programmes-service:5629/api/v1/programmes
+    routes:
+      - name: programmes-route
+        paths:
+          - /api/v1/programmes
+        protocols:
+          - http
+          - https
+  - name: recommendations-service
+    url: http://recommendations-service:5313/api/v1/recommendations
+    routes:
+      - name: recommendations-route
+        paths:
+          - /api/v1/recommendations
+        protocols:
+          - http
+          - https
+  - name: subscription-service
+    url: http://subscription-service:5800/api/v1/subscription
+    routes:
+      - name: subscription-route
+        paths:
+          - /api/v1/subscription
+        protocols:
+          - http
+          - https
+  - name: support-service
+    url: http://support-service:5212/api/v1/support
+    routes:
+      - name: support-route
+        paths:
+          - /api/v1/support
+        protocols:
+          - http
+          - https
+  - name: ticket-service
+    url: http://ticket-service:5483/api/v1/ticket
+    routes:
+      - name: ticket-route
+        paths:
+          - /api/v1/ticket
+        protocols:
+          - http
+          - https
+  - name: transaction-service
+    url: http://transaction-service:5473/api/v1/transaction
+    routes:
+      - name: transaction-route
+        paths:
+          - /api/v1/transaction
+        protocols:
+          - http
+          - https
+  - name: user-service
+    url: http://user-service:5767/api/v1/user
+    routes:
+      - name: user-route
+        paths:
+          - /api/v1/user
+        protocols:
+          - http
+          - https
+  - name: vanue-service
+    url: http://vanue-service:5829/api/v1/vanue
+    routes:
+      - name: vanue-route
+        paths:
+          - /api/v1/vanue
+        protocols:
+          - http
+          - https

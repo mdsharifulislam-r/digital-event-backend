@@ -93,6 +93,7 @@ const sendPushNotification = async (
       filePath: payload.filePath,
       referenceId: payload.referenceId,
       owner: user.id,
+      extraPath: payload?.extraPath,
     });
   } catch (error) {
     console.log(error);

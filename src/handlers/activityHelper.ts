@@ -2,9 +2,15 @@ import { Activity } from "../app/modules/activity/activity.model";
 import { User } from "../app/modules/user/user.model";
 import { ACTIVITY_TYPE } from "../enums/activity";
 import { USER_ROLES } from "../enums/user";
+import { kafkaProducer } from "../tools/kafka/kafka-producers/kafka.producer";
 
 export const sendActivity = async (payload:{title:string,description:string,user:any,type?:ACTIVITY_TYPE})=>{
-    payload.type = payload.type || ACTIVITY_TYPE.OTHER
+   await kafkaProducer.sendMessage("utils", {type:"activity",data:payload});
+}
+
+
+export const saveActivity = async (payload:{title:string,description:string,user:any,type?:ACTIVITY_TYPE})=>{
+ payload.type = payload.type || ACTIVITY_TYPE.OTHER
     const user = await User.findById(payload.user,{name:1});
     const title = `${user?.name} ${payload.title}`;
     const activity = await Activity.create({

@@ -21,7 +21,7 @@ const getAllAddons = async (): Promise<IAddon[]> => {
 };
 
 const updateAddonToDB = async (id: string, payload: IAddon,user:JwtPayload): Promise<IAddon | null> => {
-    const result = await Addon.findOneAndUpdate({ id }, payload, {
+    const result = await Addon.findOneAndUpdate({_id:   id }, payload, {
         new: true,
     });
     sendActivity({title:"Addon Updated",description:"You have a addon updated to your subscription",user:user.id,type:ACTIVITY_TYPE.OTHER})
@@ -29,7 +29,7 @@ const updateAddonToDB = async (id: string, payload: IAddon,user:JwtPayload): Pro
 };
 
 const deleteAddonFromDB = async (id: string,user:JwtPayload): Promise<IAddon | null> => {
-    const result = await Addon.findOneAndDelete({ id });
+    const result = await Addon.findOneAndDelete({ _id: id });
     sendActivity({title:"Addon Deleted",description:"You have a addon deleted to your subscription",user:user.id,type:ACTIVITY_TYPE.OTHER})
     return result;
 };

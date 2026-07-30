@@ -10,7 +10,11 @@ export type ISubscription = {
     txId: string;
     package?: Types.ObjectId;
     modules:number[],
-    addons:Types.ObjectId[]
+    addons:Types.ObjectId[],
+    vanues:number
+    programmes:number,
+    is_proggramme_sell:boolean
+    minimum_programme_price?:number
 }
 
 export  type SubscriptionModel = Model<ISubscription, Record<string, any>>;

@@ -125,7 +125,17 @@ const verifyEmailToDB = async (payload: IVerifyEmail) => {
       { verified: true, authentication: { oneTimeCode: null, expireAt: null } }
     );
     sendActivity({title:"Created Account",description:"You have created an account",user:isExistUser._id,type:ACTIVITY_TYPE.USER});
+    const accessToken = jwtHelper.createToken(
+      {
+        id: isExistUser._id,
+        role: isExistUser.role,
+        email: isExistUser.email,
+      },
+      config.jwt.jwt_secret as Secret,
+      config.jwt.jwt_expire_in as string
+    )
     message = 'Email verify successfully';
+    data = { accessToken, role: isExistUser.role };
   } else {
     await User.findOneAndUpdate(
       { _id: isExistUser._id },
@@ -264,9 +274,9 @@ const saveFaceDiscriminatorToDB = async (user: JwtPayload, face_image: string,de
   if(!discriminator){
     throw new ApiError(StatusCodes.BAD_REQUEST, 'No face detected in the image');
   }
-  const existingDescriptor = await FaceVerification.findOne({ userId: user.id, device_id });
+  const existingDescriptor = await FaceVerification.findOne({device_id });
   if(existingDescriptor){
-    await FaceVerification.findOneAndUpdate({ userId: user.id, device_id }, { faceDescriptor: discriminator });
+    await FaceVerification.findOneAndUpdate({device_id}, { faceDescriptor: discriminator });
   }else{
     await FaceVerification.create({ userId: user.id, faceDescriptor: discriminator, device_id });
   }

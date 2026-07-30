@@ -12,6 +12,9 @@ router.route('/')
     .post(auth(USER_ROLES.ORGANIZATION),fileUploadHandler(),validateRequest(RecommendationsValidations.createRecommendationSchema),RecommendationsController.createRecommendation)
     .get(auth(),RecommendationsController.getAllRecommendations);
 
+router.route('/bulk-gets')
+    .post(auth(),validateRequest(RecommendationsValidations.getBulkRecommendationSchema),RecommendationsController.getBulkRecommendations);
+
 router.route('/:id')
     .get(auth(),RecommendationsController.getRecommendationById)
     .patch(auth(USER_ROLES.ORGANIZATION),fileUploadHandler(),validateRequest(RecommendationsValidations.updateRecommendationSchema),RecommendationsController.updateRecommendation)

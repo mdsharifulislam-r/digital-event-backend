@@ -46,6 +46,7 @@ export interface IEvent {
   qr_code_url?: string;
   vanue:Types.ObjectId;
   programme:Types.ObjectId;
+  artist:Types.ObjectId;
   social: {
     share_url: string;
     share_text: string;
@@ -67,7 +68,7 @@ export type EventModel = Model<IEvent>;
 export type IClick ={
   item: Types.ObjectId;
   user: Types.ObjectId;
-  type:"Event" | "Recommendations"; 
+  type:"Event" | "Recommendations"|"Performances"
 }
 
 export type ClickModel = Model<IClick>&{
@@ -99,11 +100,11 @@ export type QrScanModel = Model<IQrScan>&{
 export type IFavorite ={
   item: Types.ObjectId;
   user: Types.ObjectId;
-  type:"Event" | "Recommendations"; 
+  type:"Event" | "Recommendations" | 'Venue';
 }
 
 export type FavoriteModel = Model<IFavorite>&{
-  toggleFavorite: (itemId: Types.ObjectId, userId: Types.ObjectId, type:"Event" | "Recommendations") => Promise<{ favorited: boolean }>;
+  toggleFavorite: (itemId: Types.ObjectId, userId: Types.ObjectId, type:"Event" | "Recommendations"|"Venue"|'Performances') => Promise<{ favorited: boolean }>;
 }
 
 

@@ -56,6 +56,10 @@ const transactionSchema = new Schema<ITransaction, TransactionModel>({
     enum:TRANSACTION_TYPE,
     default: TRANSACTION_TYPE.PAYMENT,
   },
+  subscription: {
+    type: Schema.Types.ObjectId,
+    ref: 'Subscription',
+  },
 }, {
   timestamps: true,
 });

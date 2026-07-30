@@ -9,7 +9,7 @@ import { StatusCodes } from 'http-status-codes';
 import { Programmes } from '../programmes/programmes.model';
 import stripe from '../../../config/stripe';
 import { Booking } from '../booking/booking.model';
-import { Follower } from '../user/user.model';
+import { Follower, User } from '../user/user.model';
 import { sendActivity } from '../../../handlers/activityHelper';
 import { ACTIVITY_TYPE } from '../../../enums/activity';
 
@@ -46,6 +46,14 @@ const getEventById = async (id: string,userId:string,qrCode?:boolean) => {
     {
         path:'nearby_bars',
     },
+    {
+      path: 'artist',
+      select: 'name image type',
+    },
+    {
+      path: 'programme',
+      select: 'title cover_image price_pence',
+    }
   ]).lean();
 
   const isFavorited = await Favorite.countDocuments({ item: id, user: userId, type: "Event" }).lean() > 0;
@@ -73,6 +81,10 @@ const getEventById = async (id: string,userId:string,qrCode?:boolean) => {
 };
 
 const updateEvent = async (id: string, data: Partial<IEvent>) => {
+  const isExist = await Event.findById(id);
+  if (!isExist) {
+    throw new ApiError(StatusCodes.NOT_FOUND, 'Event not found');
+  }
   const updatedEvent = await Event.findByIdAndUpdate(id, data, { new: true });
   if (updatedEvent) {
     await RedisHelper.keyDelete(`events_all:${updatedEvent.author}:*`);
@@ -105,7 +117,7 @@ const getAllEvents = async (query: Record<string, any>, user: JwtPayload) => {
     .paginate()
 
   const [events, paginationInfo] = await Promise.all([
-    eventQuery.modelQuery.exec(),
+    eventQuery.modelQuery.populate('vanue','name address_line1').exec(),
     eventQuery.getPaginationInfo(),
   ]);
 
@@ -123,6 +135,9 @@ const searchEvents = async (query: Record<string, any>,user:JwtPayload) => {
                 $lte: new Date(query.endDate)
             }
         };
+    }
+    if(query.category){
+        query.category = query.category[0].toUpperCase() + query.category.slice(1);
     }
     const eventQuery = new QueryBuilder(Event.find(initQuery,{
         address: 1,
@@ -155,7 +170,7 @@ const searchEvents = async (query: Record<string, any>,user:JwtPayload) => {
 }
 
 
-const makeFavorite = async (itemId: string, userId: string, type: "Event" | "Recommendations") => {
+const makeFavorite = async (itemId: string, userId: string, type: "Event" | "Recommendations"|'Venue'|'Performances') => {
   const result = await Favorite.toggleFavorite(new Types.ObjectId(itemId), new Types.ObjectId(userId), type);
   return result;
 }
@@ -166,6 +181,7 @@ const purchaseProggramme = async (eventId: string, userId: string) => {
     if(!event){
         throw new ApiError(StatusCodes.NOT_FOUND, "Event not found");
     }
+
 
     const programme = await Programmes.findById(event.programme);
     if(!programme){
@@ -198,20 +214,36 @@ const purchaseProggramme = async (eventId: string, userId: string) => {
                     name: `Programme for ${event.title}`,
                     description:`${programme.title} for ${event.title}`,
                 },
-                unit_amount: event.price * 100, // Convert to cents
+                unit_amount: programme.price_pence, // Convert to cents
             },
             quantity: 1,
         }],
         mode: 'payment',
-        success_url: `http://localhost:3000/purchase-success?session_id={CHECKOUT_SESSION_ID}`,
+        success_url: `http://localhost:3000/purchase-success`,
         cancel_url: `http://localhost:3000/purchase-cancelled`,
         metadata: {
             bookingId: newBooking._id.toString()
-        }
+        },
+        customer_email: (await User.findById(userId))?.email
     });
 
     return session.url;
 
+}
+
+
+const getAllFavorites = async (user:JwtPayload,query:Record<string, any>) => {
+  const favoriteQuery = new QueryBuilder(Favorite.find({ user: user.id }), query).paginate().sort().filter()
+  let [favorites, paginationInfo] = await Promise.all([
+      favoriteQuery.modelQuery.populate('item').exec(),
+      favoriteQuery.getPaginationInfo(),
+  ])
+
+  favorites = await Promise.all(favorites.map(async favorite => {
+      return favorite.item;
+  })) as any[]
+
+  return { favorites, paginationInfo };
 }
 
 
@@ -223,5 +255,6 @@ export const EventServices = {
   getAllEvents,
   searchEvents,
   makeFavorite,
-  purchaseProggramme
+  purchaseProggramme,
+  getAllFavorites
 };

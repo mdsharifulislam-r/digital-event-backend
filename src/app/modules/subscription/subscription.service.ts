@@ -13,6 +13,9 @@ import { RedisHelper } from "../../../tools/redis/redis.helper";
 import generateOTP from "../../../util/generateOTP";
 import { emailHelper } from "../../../helpers/emailHelper";
 import { emailTemplate } from "../../../shared/emailTemplate";
+import { kafkaProducer } from "../../../tools/kafka/kafka-producers/kafka.producer";
+import { INotification } from "../notification/notification.interface";
+import { sendNotificationQueue } from "../../../helpers/notificationHelper";
 
 export interface AppleReceiptResponse {
   status: number;
@@ -306,6 +309,30 @@ const renewSubscription = async (user: JwtPayload) => {
 
 };
 
+
+const cancelSubscription = async (id:string) => {
+  const subscription = await Subscription.findById(id);
+  if (!subscription) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Subscription doesn't exist!");
+  }
+
+  if (subscription.status !== "active") {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Subscription is not active!");
+  }
+
+  await Subscription.findOneAndUpdate({ _id: id }, { $set: { status: "cancelled" } });
+
+  sendNotificationQueue({
+    title: "Subscription Cancelled",
+    message: "Your subscription has been cancelled by the admin.",
+    receiver: [subscription.user],
+    isRead: false,
+    filePath: "subscription",
+  } as INotification
+  )
+
+}
+
 export const SubscriptionService = {
   verifyAppleReceipt,
   getSubscriptionByUser,
@@ -316,5 +343,6 @@ export const SubscriptionService = {
   subscriptionUsers,
   getSubscriptionDetailsById,
   transactionOfSubscriptionByOtp,
-  renewSubscription
+  renewSubscription,
+  cancelSubscription
 };

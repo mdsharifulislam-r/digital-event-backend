@@ -15,7 +15,7 @@ const fileUploadHandler = (customFile: FileUpload[] = []) => {
   const fileTypeArray: Required<FileUpload>[] = [
     {
       name: 'image',
-      type: ['image/jpeg', 'image/png', 'image/jpg'],
+      type: ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'],
       maxCount: 3,
     },
     {

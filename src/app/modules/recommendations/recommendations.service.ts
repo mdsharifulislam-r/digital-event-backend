@@ -57,11 +57,17 @@ const getAllRecommendations = async (query: Record<string, any>,user:JwtPayload)
 }
 
 
+const getBulkRecommendations = async (ids: string[]) => {
+  const recommendations = await Recommendations.find({ _id: { $in: ids } });
+  return recommendations;
+}
+
 
 export const RecommendationsServices = {
     createRecommendation,
     getRecommendationById,
     updateRecommendation,
     deleteRecommendation,
-    getAllRecommendations
+    getAllRecommendations,
+    getBulkRecommendations
 };

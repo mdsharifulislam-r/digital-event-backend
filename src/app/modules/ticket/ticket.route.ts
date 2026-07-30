@@ -8,12 +8,20 @@ import fileUploadHandler from '../../middlewares/fileUploadHandler';
 const router = express.Router();
 
 router.route('/')
-    .post(auth(),fileUploadHandler(),validateRequest(TicketValidations.createTicketZodSchema),TicketController.createTicket)
+    .post(auth(),fileUploadHandler([{
+      name: 'file',
+      maxCount: 1
+    }]),validateRequest(TicketValidations.createTicketZodSchema),TicketController.createTicket)
     .get(auth(),TicketController.getAllTickets);
 
 router.route('/:id')
     .get(auth(),TicketController.getTicketById)
-    .patch(auth(),fileUploadHandler(),validateRequest(TicketValidations.updateTicketZodSchema),TicketController.updateTicket)
+    .patch(auth(),fileUploadHandler([
+      {
+        name: 'file',
+        maxCount: 1
+      }
+    ]),validateRequest(TicketValidations.updateTicketZodSchema),TicketController.updateTicket)
     .delete(auth(),TicketController.deleteTicket);
 
 

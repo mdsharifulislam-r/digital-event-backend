@@ -59,6 +59,21 @@ const packageSchema = new mongoose.Schema<IPackage,PackageModel>({
         type: Boolean,
         default: false,
     },
+    vanues: {
+        type: Number,
+        default: 0,
+    },
+    programmes: {
+        type: Number,
+        default: 0,
+    },
+    is_proggramme_sell: {
+        type: Boolean,
+        default: false
+    },
+    minimum_programme_price: {
+        type: Number,
+    }
 
 },{
     timestamps: true

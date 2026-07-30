@@ -20,7 +20,7 @@ const subscriptionSchema = new Schema<ISubscription,SubscriptionModel>({
   },
   status: {
     type: String,
-    enum: ['active', 'expired'],
+    enum: ['active', 'expired', 'cancelled'],
     default: 'active',
   },
   user: {
@@ -45,7 +45,23 @@ const subscriptionSchema = new Schema<ISubscription,SubscriptionModel>({
     type: [Schema.Types.ObjectId],
     required: false,
     default: [],
-  }
+  },
+  vanues: {
+    type:Number,
+    default:0,
+  },
+  programmes: {
+    type:Number,
+    default:0,
+  },
+  is_proggramme_sell: {
+    type:Boolean,
+    default:false,
+  },
+  minimum_programme_price: {
+    type:Number,
+    default:0,
+  },
 },{
     timestamps:true
 });

@@ -1,24 +1,23 @@
 services:
   kong:
-    image: kong # specific version recommended instead of latest
+    image: kong
     container_name: kong
     environment:
-      KONG_DATABASE: "off"
+      KONG_DATABASE: 'off'
       KONG_DECLARATIVE_CONFIG: /etc/kong/kong.yml
       KONG_PROXY_ACCESS_LOG: /dev/stdout
       KONG_ADMIN_ACCESS_LOG: /dev/stdout
       KONG_PROXY_ERROR_LOG: /dev/stderr
       KONG_ADMIN_ERROR_LOG: /dev/stderr
-      KONG_NGINX_WORKER_PROCESSES: "auto"
-      KONG_NGINX_WORKER_CONNECTIONS: "4096"
+      KONG_NGINX_WORKER_PROCESSES: auto
+      KONG_NGINX_WORKER_CONNECTIONS: '4096'
     volumes:
       - ./kong.yaml:/etc/kong/kong.yml:ro
     ports:
-      - "${IP_ADDRESS}:${PORT}:8000"
-      - "10.10.7.9:8001:8001"
+      - ${IP_ADDRESS}:${PORT}:8000
+      - 10.10.7.9:8001:8001
     networks:
       - template-network
-
   kong-keepalive:
     build:
       context: .
@@ -38,7 +37,6 @@ services:
       - REDIS_PORT=6379
       - KAFKA_URL=kafka:9092
       - ELASTICSEARCH_URL=http://elasticsearch:9200
-      
     networks:
       - template-network
     ports:
@@ -62,6 +60,291 @@ services:
       - '5043:5043'
     volumes:
       - shared-data:/app/uploads
+  activity-service:
+    build: .
+    ports:
+      - '5863:5863'
+    environment:
+      - PORT=5863
+      - DATABASE_URL=${MONGO_URL}
+      - BACKUP_DATABASE_URL=mongodb://mongo:27017/embay
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - KAFKA_URL=kafka:9092
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - IP_ADDRESS=0.0.0.0
+    networks:
+      - template-network
+  ad-service:
+    build: .
+    ports:
+      - '5536:5536'
+    environment:
+      - PORT=5536
+      - DATABASE_URL=${MONGO_URL}
+      - BACKUP_DATABASE_URL=mongodb://mongo:27017/embay
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - KAFKA_URL=kafka:9092
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - IP_ADDRESS=0.0.0.0
+    networks:
+      - template-network
+  addon-service:
+    build: .
+    ports:
+      - '5618:5618'
+    environment:
+      - PORT=5618
+      - DATABASE_URL=${MONGO_URL}
+      - BACKUP_DATABASE_URL=mongodb://mongo:27017/embay
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - KAFKA_URL=kafka:9092
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - IP_ADDRESS=0.0.0.0
+    networks:
+      - template-network
+  artist-service:
+    build: .
+    ports:
+      - '5125:5125'
+    environment:
+      - PORT=5125
+      - DATABASE_URL=${MONGO_URL}
+      - BACKUP_DATABASE_URL=mongodb://mongo:27017/embay
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - KAFKA_URL=kafka:9092
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - IP_ADDRESS=0.0.0.0
+    networks:
+      - template-network
+  auth-service:
+    build: .
+    ports:
+      - '5413:5413'
+    environment:
+      - PORT=5413
+      - DATABASE_URL=${MONGO_URL}
+      - BACKUP_DATABASE_URL=mongodb://mongo:27017/embay
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - KAFKA_URL=kafka:9092
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - IP_ADDRESS=0.0.0.0
+    networks:
+      - template-network
+  booking-service:
+    build: .
+    ports:
+      - '5103:5103'
+    environment:
+      - PORT=5103
+      - DATABASE_URL=${MONGO_URL}
+      - BACKUP_DATABASE_URL=mongodb://mongo:27017/embay
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - KAFKA_URL=kafka:9092
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - IP_ADDRESS=0.0.0.0
+    networks:
+      - template-network
+  dashboard-service:
+    build: .
+    ports:
+      - '5858:5858'
+    environment:
+      - PORT=5858
+      - DATABASE_URL=${MONGO_URL}
+      - BACKUP_DATABASE_URL=mongodb://mongo:27017/embay
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - KAFKA_URL=kafka:9092
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - IP_ADDRESS=0.0.0.0
+    networks:
+      - template-network
+  event-service:
+    build: .
+    ports:
+      - '5267:5267'
+    environment:
+      - PORT=5267
+      - DATABASE_URL=${MONGO_URL}
+      - BACKUP_DATABASE_URL=mongodb://mongo:27017/embay
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - KAFKA_URL=kafka:9092
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - IP_ADDRESS=0.0.0.0
+    networks:
+      - template-network
+  faq-service:
+    build: .
+    ports:
+      - '5900:5900'
+    environment:
+      - PORT=5900
+      - DATABASE_URL=${MONGO_URL}
+      - BACKUP_DATABASE_URL=mongodb://mongo:27017/embay
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - KAFKA_URL=kafka:9092
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - IP_ADDRESS=0.0.0.0
+    networks:
+      - template-network
+  notification-service:
+    build: .
+    ports:
+      - '5929:5929'
+    environment:
+      - PORT=5929
+      - DATABASE_URL=${MONGO_URL}
+      - BACKUP_DATABASE_URL=mongodb://mongo:27017/embay
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - KAFKA_URL=kafka:9092
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - IP_ADDRESS=0.0.0.0
+    networks:
+      - template-network
+  package-service:
+    build: .
+    ports:
+      - '5840:5840'
+    environment:
+      - PORT=5840
+      - DATABASE_URL=${MONGO_URL}
+      - BACKUP_DATABASE_URL=mongodb://mongo:27017/embay
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - KAFKA_URL=kafka:9092
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - IP_ADDRESS=0.0.0.0
+    networks:
+      - template-network
+  programmes-service:
+    build: .
+    ports:
+      - '5629:5629'
+    environment:
+      - PORT=5629
+      - DATABASE_URL=${MONGO_URL}
+      - BACKUP_DATABASE_URL=mongodb://mongo:27017/embay
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - KAFKA_URL=kafka:9092
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - IP_ADDRESS=0.0.0.0
+    networks:
+      - template-network
+  recommendations-service:
+    build: .
+    ports:
+      - '5313:5313'
+    environment:
+      - PORT=5313
+      - DATABASE_URL=${MONGO_URL}
+      - BACKUP_DATABASE_URL=mongodb://mongo:27017/embay
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - KAFKA_URL=kafka:9092
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - IP_ADDRESS=0.0.0.0
+    networks:
+      - template-network
+  subscription-service:
+    build: .
+    ports:
+      - '5800:5800'
+    environment:
+      - PORT=5800
+      - DATABASE_URL=${MONGO_URL}
+      - BACKUP_DATABASE_URL=mongodb://mongo:27017/embay
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - KAFKA_URL=kafka:9092
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - IP_ADDRESS=0.0.0.0
+    networks:
+      - template-network
+  support-service:
+    build: .
+    ports:
+      - '5212:5212'
+    environment:
+      - PORT=5212
+      - DATABASE_URL=${MONGO_URL}
+      - BACKUP_DATABASE_URL=mongodb://mongo:27017/embay
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - KAFKA_URL=kafka:9092
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - IP_ADDRESS=0.0.0.0
+    networks:
+      - template-network
+  ticket-service:
+    build: .
+    ports:
+      - '5483:5483'
+    environment:
+      - PORT=5483
+      - DATABASE_URL=${MONGO_URL}
+      - BACKUP_DATABASE_URL=mongodb://mongo:27017/embay
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - KAFKA_URL=kafka:9092
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - IP_ADDRESS=0.0.0.0
+    networks:
+      - template-network
+  transaction-service:
+    build: .
+    ports:
+      - '5473:5473'
+    environment:
+      - PORT=5473
+      - DATABASE_URL=${MONGO_URL}
+      - BACKUP_DATABASE_URL=mongodb://mongo:27017/embay
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - KAFKA_URL=kafka:9092
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - IP_ADDRESS=0.0.0.0
+    networks:
+      - template-network
+  user-service:
+    build: .
+    ports:
+      - '5767:5767'
+    environment:
+      - PORT=5767
+      - DATABASE_URL=${MONGO_URL}
+      - BACKUP_DATABASE_URL=mongodb://mongo:27017/embay
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - KAFKA_URL=kafka:9092
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - IP_ADDRESS=0.0.0.0
+    networks:
+      - template-network
+  vanue-service:
+    build: .
+    ports:
+      - '5829:5829'
+    environment:
+      - PORT=5829
+      - DATABASE_URL=${MONGO_URL}
+      - BACKUP_DATABASE_URL=mongodb://mongo:27017/embay
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - KAFKA_URL=kafka:9092
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+      - IP_ADDRESS=0.0.0.0
+    networks:
+      - template-network
 volumes:
   shared-data: null
 networks:

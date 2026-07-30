@@ -10,6 +10,7 @@ export type ITransaction = {
   order?: Types.ObjectId;
   user?: Types.ObjectId;
   organization?: Types.ObjectId;
+  subscription?:Types.ObjectId
   proggramme?: Types.ObjectId;
   status: TRANSACTION_STATUS;
   payment_status:TRANSACTION_PAYMENT_TYPE

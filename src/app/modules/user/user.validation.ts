@@ -63,9 +63,25 @@ const followUserZodSchema = z.object({
   }),
 })
 
+const suspendUserZodSchema = z.object({
+  body: z.object({
+    days: z.number({ required_error: 'Days is required' }),
+    reason: z.string({ required_error: 'Reason is required' }),
+  }),
+})
+
+
+const deleteAccountZodSchema = z.object({
+  body: z.object({
+    password: z.string({ required_error: 'Password is required' }),
+  }),
+})
+
 export const UserValidation = {
   createUserZodSchema,
   updateUserZodSchema,
   createOrganizationZodSchema,
-  followUserZodSchema
+  followUserZodSchema,
+  suspendUserZodSchema,
+  deleteAccountZodSchema
 };

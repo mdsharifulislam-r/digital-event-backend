@@ -20,8 +20,6 @@ const notificationSchema = new Schema<INotification, NotificationModel>(
 
     filePath: {
       type: String,
-      enum: ["booking", "payment", "general", "review", 'referral', 'subscription'],
-      default: "general",
     },
     isRead: {
       type: Boolean,
@@ -39,8 +37,12 @@ const notificationSchema = new Schema<INotification, NotificationModel>(
         type: Schema.Types.ObjectId,
         ref: "User",
       },
-    ]
+    ],
+    extraPath: {
+      type: String,
+    }
   },
+
   {
     timestamps: true,
   }

@@ -1,6 +1,7 @@
 import { Schema, model } from 'mongoose';
 import { IProgrammes, ProgrammesModel } from './programmes.interface';
 import { Venue } from '../vanue/vanue.model';
+import { Event } from '../event/event.model';
 
 /* ---------------- Block Schema (Flexible for all 20+ types) ---------------- */
 const BlockSchema = new Schema(
@@ -55,7 +56,7 @@ const ProgrammePageSchema = new Schema(
 const programmesSchema = new Schema<IProgrammes, ProgrammesModel>(
   {
 
-    venue_id: { type: Schema.Types.ObjectId, required: true, ref: 'Venue' },
+    venue_id: { type: Schema.Types.ObjectId, required: false, ref: 'Venue' },
 
     owner: { type: Schema.Types.ObjectId, required: true, ref: 'User' },
 
@@ -91,6 +92,8 @@ const programmesSchema = new Schema<IProgrammes, ProgrammesModel>(
     price_pence: { type: Number, default: 0 },
 
     published_at: { type: Date },
+    clicks: { type: Number, default: 0 },
+    views: { type: Number, default: 0 },
   },
   {
     timestamps: true,
@@ -100,6 +103,9 @@ const programmesSchema = new Schema<IProgrammes, ProgrammesModel>(
 programmesSchema.pre('save',async function (next) {
   if(this.venue_id){
     await Venue.findByIdAndUpdate(this.venue_id, { $inc: { programmes_count: 1 } });
+  }
+  if(this.event_id){
+    await Event.findByIdAndUpdate(this.event_id, {programme: this._id});
   }
   next();
 })
