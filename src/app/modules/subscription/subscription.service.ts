@@ -171,7 +171,7 @@ const demoSubscriptionForTest = async (packageId:string,user:JwtPayload)=>{
 const getSubscriptionByUser = async (user: JwtPayload) => {
   const subscription = await Subscription.findOne({ user: user.id,status:"active" }).populate('user','name email image address designation').lean()
   if (!subscription) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, "Subscription doesn't exist!");
+    return {}
   }
   const remaningDays = Math.floor((subscription.endDate.getTime() - new Date().getTime()) / 1000 / 60 / 60 / 24);
   return {
