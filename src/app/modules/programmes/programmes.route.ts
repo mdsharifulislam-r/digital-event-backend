@@ -26,6 +26,9 @@ router.route('/revenue-graph-data')
 
 router.post('/upload-images',auth(USER_ROLES.ORGANIZATION),fileUploadHandler(),ProgrammesController.uploadProggrameImages);
 
+router.route('/booking-count/:id')
+    .get(auth(USER_ROLES.ORGANIZATION),ProgrammesController.getBookingCountForProgrammes);
+
 router.route('/:id')
     .get(auth(),ProgrammesController.getProgrammesById)
     .patch(auth(USER_ROLES.ORGANIZATION),ProgrammesController.updateProgrammes)

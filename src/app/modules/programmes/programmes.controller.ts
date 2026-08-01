@@ -141,6 +141,20 @@ const uploadProggrameImages = catchAsync(
   },
 )
 
+
+const getBookingCountForProgrammes = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const programmeId = req.params.id;
+    const result = await ProgrammesServices.getBookingCountForProgrammes(programmeId as any);
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: 'Booking count for programme retrieved successfully',
+      data: result,
+    });
+  },
+);
+
 export const ProgrammesController = {
   createProgrammes,
   getProgrammesById,
@@ -150,5 +164,6 @@ export const ProgrammesController = {
   getAnalyticsForProgrammes,
   getViewsAndClicksGraphData,
   getRevenueGraphData,
-  uploadProggrameImages
+  uploadProggrameImages,
+  getBookingCountForProgrammes
 };

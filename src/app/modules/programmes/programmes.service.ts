@@ -460,6 +460,11 @@ const getRevenueGraphData = async (user: JwtPayload, query: IProgrammesAnalytics
 }
 
 
+const getBookingCountForProgrammes = async (proggramme: Types.ObjectId) => {
+  return await Booking.countDocuments({ programme: proggramme, status: 'confirmed' });
+};
+
+
 
 export const ProgrammesServices = {
   createProgrammes,
@@ -469,5 +474,6 @@ export const ProgrammesServices = {
   getAllProgrammes,
   getAnalyticsForProgrammes,
   getViewsAndClicksGraphData,
-  getRevenueGraphData
+  getRevenueGraphData,
+  getBookingCountForProgrammes
 };
