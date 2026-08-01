@@ -1,41 +1,133 @@
 import { ICreateAccount, IResetPassword } from '../types/emailTamplate';
 
+const LOGO = 'https://res.cloudinary.com/dkbcx9amc/image/upload/v1785595063/logo_1_gq04qz.png';
+
 const createAccount = (values: ICreateAccount) => {
-  const data = {
+  return {
     to: values.email,
-    subject: 'Verify your account',
-    html: `<body style="font-family: Arial, sans-serif; background-color: #f9f9f9; margin: 50px; padding: 20px; color: #555;">
-    <div style="width: 100%; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #fff; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
-        <img src="https://i.postimg.cc/6pgNvKhD/logo.png" alt="Logo" style="display: block; margin: 0 auto 20px; width:150px" />
-          <h2 style="color: #277E16; font-size: 24px; margin-bottom: 20px;">Hey! ${values.name}, Your Toothlens Account Credentials</h2>
-        <div style="text-align: center;">
-            <p style="color: #555; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">Your single use code is:</p>
-            <div style="background-color: #277E16; width: 80px; padding: 10px; text-align: center; border-radius: 8px; color: #fff; font-size: 25px; letter-spacing: 2px; margin: 20px auto;">${values.otp}</div>
-            <p style="color: #555; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">This code is valid for 3 minutes.</p>
-        </div>
+    subject: 'Verify your SHOWE account',
+    html: `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body style="margin:0;padding:0;background:#071B2C;font-family:Arial,Helvetica,sans-serif;color:#E5E7EB;">
+  <div style="max-width:640px;margin:40px auto;background:#0B2238;border:1px solid #15344F;border-radius:20px;overflow:hidden;">
+
+    <div style="padding:32px;text-align:center;background:linear-gradient(180deg,#0D2742 0%,#0B2238 100%);">
+      <img src="${LOGO}" alt="SHOWE" style="width:140px;margin-bottom:24px;" />
+      <h1 style="margin:0;font-size:32px;color:#FFFFFF;font-weight:700;">Welcome to SHOWE</h1>
+      <p style="margin:16px 0 0;color:#D1D5DB;font-size:16px;line-height:1.7;">
+        Step into the story before the curtain rises.
+      </p>
     </div>
-</body>`,
+
+    <div style="padding:40px 32px;">
+      <p style="margin:0 0 16px;font-size:18px;color:#FFFFFF;">
+        Hi ${values.name},
+      </p>
+
+      <p style="margin:0 0 28px;color:#D1D5DB;font-size:16px;line-height:1.8;">
+        Verify your SHOWE account to access your digital programme in seconds,
+        discover the people and moments behind the event, and experience every moment
+        before, during, and after.
+      </p>
+
+      <div style="text-align:center;margin:36px 0;">
+        <div style="display:inline-block;background:#F5B400;color:#071B2C;font-size:34px;font-weight:700;letter-spacing:8px;padding:18px 32px;border-radius:16px;">
+          ${values.otp}
+        </div>
+      </div>
+
+      <p style="text-align:center;color:#D1D5DB;font-size:15px;margin:0;">
+        This verification code is valid for
+        <strong style="color:#F5B400;">3 minutes</strong>.
+      </p>
+
+      <div style="margin:40px 0;border-top:1px solid #1E3A56;"></div>
+
+      <p style="margin:0;color:#9CA3AF;font-size:14px;line-height:1.7;">
+        If you didn't create a SHOWE account, you can safely ignore this email.
+      </p>
+    </div>
+
+    <div style="padding:24px 32px;background:#081827;border-top:1px solid #15344F;text-align:center;">
+      <p style="margin:0;color:#9CA3AF;font-size:13px;">
+        SHOWE — Your digital event experience platform
+      </p>
+    </div>
+  </div>
+</body>
+</html>
+`,
   };
-  return data;
 };
 
 const resetPassword = (values: IResetPassword) => {
-  const data = {
+  return {
     to: values.email,
-    subject: 'Reset your password',
-    html: `<body style="font-family: Arial, sans-serif; background-color: #f9f9f9; margin: 50px; padding: 20px; color: #555;">
-    <div style="width: 100%; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #fff; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
-        <img src="https://i.postimg.cc/6pgNvKhD/logo.png" alt="Logo" style="display: block; margin: 0 auto 20px; width:150px" />
-        <div style="text-align: center;">
-            <p style="color: #555; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">Your single use code is:</p>
-            <div style="background-color: #277E16; width: 80px; padding: 10px; text-align: center; border-radius: 8px; color: #fff; font-size: 25px; letter-spacing: 2px; margin: 20px auto;">${values.otp}</div>
-            <p style="color: #555; font-size: 16px; line-height: 1.5; margin-bottom: 20px;">This code is valid for 3 minutes.</p>
-                <p style="color: #b9b4b4; font-size: 16px; line-height: 1.5; margin-bottom: 20px;text-align:left">If you didn't request this code, you can safely ignore this email. Someone else might have typed your email address by mistake.</p>
-        </div>
+    subject: 'Reset your SHOWE password',
+    html: `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+</head>
+<body style="margin:0;padding:0;background:#071B2C;font-family:Arial,Helvetica,sans-serif;color:#E5E7EB;">
+  <div style="max-width:640px;margin:40px auto;background:#0B2238;border:1px solid #15344F;border-radius:20px;overflow:hidden;">
+
+    <div style="padding:32px;text-align:center;background:linear-gradient(180deg,#0D2742 0%,#0B2238 100%);">
+      <img src="${LOGO}" alt="SHOWE" style="width:140px;margin-bottom:24px;" />
+      <h1 style="margin:0;font-size:30px;color:#FFFFFF;font-weight:700;">
+        Password reset request
+      </h1>
+      <p style="margin:16px 0 0;color:#D1D5DB;font-size:16px;line-height:1.7;">
+        Secure access to your event experience.
+      </p>
     </div>
-</body>`,
+
+    <div style="padding:40px 32px;">
+      <p style="margin:0 0 16px;font-size:18px;color:#FFFFFF;">
+        Hello,
+      </p>
+
+      <p style="margin:0 0 28px;color:#D1D5DB;font-size:16px;line-height:1.8;">
+        We received a request to reset your SHOWE password.
+        Use the verification code below to continue securely.
+      </p>
+
+      <div style="text-align:center;margin:36px 0;">
+        <div style="display:inline-block;background:#F5B400;color:#071B2C;font-size:34px;font-weight:700;letter-spacing:8px;padding:18px 32px;border-radius:16px;">
+          ${values.otp}
+        </div>
+      </div>
+
+      <p style="text-align:center;color:#D1D5DB;font-size:15px;margin:0;">
+        This code is valid for
+        <strong style="color:#F5B400;">3 minutes</strong>.
+      </p>
+
+      <div style="margin:40px 0;border-top:1px solid #1E3A56;"></div>
+
+      <p style="margin:0;color:#9CA3AF;font-size:14px;line-height:1.8;">
+        If you didn't request a password reset, you can safely ignore this email.
+        Your SHOWE account will remain secure, and no changes will be made.
+      </p>
+    </div>
+
+    <div style="padding:24px 32px;background:#081827;border-top:1px solid #15344F;text-align:center;">
+      <p style="margin:0;color:#9CA3AF;font-size:13px;">
+        SHOWE — Before, during, and after every event
+      </p>
+    </div>
+  </div>
+</body>
+</html>
+`,
   };
-  return data;
 };
 
 export const emailTemplate = {
