@@ -17,10 +17,11 @@ export type INotification = {
 export type NotificationModel = Model<INotification>;
 
 export type ISendNotification = {
-  target: "all_proggame_holders" | "specific_event" | "specific_vanue" | "specific_performance";
+  target: "all_proggame_holders" | "specific_event" | "specific_vanue" | "specific_performance"|"specific_programme";
   event?: Types.ObjectId;
   vanue?: Types.ObjectId;
-  performance?: string
+  performance?: Types.ObjectId;
+  proggramme?: Types.ObjectId;
   title: string;
   message: string;
   filePath?: "booking" | "payment" | "general" | "review" | 'referral' | 'subscription';

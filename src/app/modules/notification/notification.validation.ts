@@ -13,12 +13,14 @@ export const sendNotificationSchema = z.object({
         'specific_event',
         'specific_vanue',
         'specific_performance',
+        'specific_programme'
       ]),
 
       event: objectIdSchema.optional(),
       vanue: objectIdSchema.optional(),
+      proggramme: objectIdSchema.optional(),
 
-      performance: z.string().optional(), // replace with detailed schema if you have one
+      performance: objectIdSchema.optional(), // replace with detailed schema if you have one
 
       title: z.string().min(1, 'Title is required'),
 
@@ -62,6 +64,14 @@ export const sendNotificationSchema = z.object({
           code: z.ZodIssueCode.custom,
           path: ['event'],
           message: 'event is required when target is specific_performance and is_only_proggram_holder is true',
+        });
+      }
+
+      if (data.target === 'specific_programme' && !data.proggramme) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['proggramme'],
+          message: 'proggramme is required when target is specific_programme',
         });
       }
     }),

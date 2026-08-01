@@ -49,6 +49,11 @@ const gotUsersForNotification = async (payload: ISendNotification, user: string)
         return fevorite;
     }
 
+    if (payload.target == "specific_programme") {
+        const bookings = await Booking.find({ programme: payload.proggramme, status: 'confirmed' }).distinct('user');
+        return bookings;
+    }
+
     return [];
 }
 
