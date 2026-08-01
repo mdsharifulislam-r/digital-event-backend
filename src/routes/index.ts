@@ -16,6 +16,7 @@ import { DashboardRoutes } from '../app/modules/dashboard/dashboard.route';
 import { TransactionRoutes } from '../app/modules/transaction/transaction.route';
 import { TicketRoutes } from '../app/modules/ticket/ticket.route';
 import { ArtistRoutes } from '../app/modules/artist/artist.route';
+import { FaqRoutes } from '../app/modules/faq/faq.route';
 const router = express.Router();
 
 const apiRoutes = [
@@ -86,6 +87,10 @@ const apiRoutes = [
   {
     path:"/artist",
     route:ArtistRoutes
+  },
+  {
+    path:"/faq",
+    route:FaqRoutes
   }
 ];
 

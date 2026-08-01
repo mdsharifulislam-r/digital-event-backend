@@ -209,7 +209,7 @@ const purchaseProggramme = async (eventId: string, userId: string) => {
         payment_method_types: ['card'],
         line_items: [{
             price_data: {
-                currency: 'usd',
+                currency: 'gbp',
                 product_data: {
                     name: `Programme for ${event.title}`,
                     description:`${programme.title} for ${event.title}`,
