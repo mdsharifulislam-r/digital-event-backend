@@ -119,7 +119,7 @@ export const createEventFormDataSchema = z.object({
 
   vanue: objectIdSchema,
 
-  programme: objectIdSchema,
+  programme: objectIdSchema.optional(),
 
   social: z.preprocess(
     parseJSON,
