@@ -70,7 +70,7 @@ services:
   #   networks:
   #     - template-network
 
-volumes:
+# volumes:
   # mongo_data:
   # redisdata:
   # esdata:
