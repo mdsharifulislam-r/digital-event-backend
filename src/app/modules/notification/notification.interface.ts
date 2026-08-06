@@ -9,6 +9,8 @@ export type INotification = {
   isRead: boolean;
   createdAt?: Date;
   filePath?: "booking" | "payment" | "general" | "review" | 'referral' | 'subscription' | 'support'
+  is_schedule_notification?: boolean;
+  schedule_time?: Date;
   referenceId?: Types.ObjectId;
   extraPath?: string;
   readers?: Types.ObjectId[];
@@ -27,5 +29,7 @@ export type ISendNotification = {
   filePath?: "booking" | "payment" | "general" | "review" | 'referral' | 'subscription';
   referenceId?: Types.ObjectId;
   extraPath?: string
-  is_only_proggram_holder?: boolean
+  is_only_proggram_holder?: boolean,
+  is_schedule_notification?: boolean,
+  schedule_time?: Date
 }

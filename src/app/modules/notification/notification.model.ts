@@ -40,7 +40,14 @@ const notificationSchema = new Schema<INotification, NotificationModel>(
     ],
     extraPath: {
       type: String,
-    }
+    },
+    is_schedule_notification: {
+      type: Boolean,
+      default: false,
+    },
+    schedule_time: {
+      type: Date,
+    },
   },
 
   {

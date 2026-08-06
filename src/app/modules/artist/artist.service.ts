@@ -15,10 +15,17 @@ const getAllArtists = async (query: Record<string, any>, user: JwtPayload) => {
     console.log(user)
     const initQuery = user?.role == USER_ROLES.ORGANIZATION ? { orgainzation: user?.id } : {}
     const artistsQuery = new QueryBuilder<IArtist>(Artist.find(initQuery), query).paginate().sort().filter().search(['name'])
-    const [artists, paginationInfo] = await Promise.all([
-        artistsQuery.modelQuery.exec(),
+    let [artists, paginationInfo] = await Promise.all([
+        artistsQuery.modelQuery.lean().exec(),
         artistsQuery.getPaginationInfo(),
     ]);
+    artists = await Promise.all(artists.map(async (artist:any) => {
+        const isFavorited = await Favorite.countDocuments({ item: artist._id, user: user?.id, type: "Artist" }).lean() > 0;
+        return {
+            ...artist,
+            isFavorited
+        }
+    })) as any[];
     return { artists, paginationInfo };
 
 }

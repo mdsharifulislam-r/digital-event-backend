@@ -33,6 +33,8 @@ export const sendNotificationSchema = z.object({
       referenceId: objectIdSchema.optional(),
       is_only_proggram_holder: z.boolean().optional(),
       extraPath: z.string().optional(),
+      is_schedule_notification: z.boolean().optional(),
+      schedule_time: z.coerce.date().refine((val) => !isNaN(val.getTime()), 'Invalid date').refine((val) => val > new Date(), 'Date must be in the future').optional(),
     })
     .superRefine((data, ctx) => {
       if (data.target === 'specific_event' && !data.event) {
@@ -72,6 +74,14 @@ export const sendNotificationSchema = z.object({
           code: z.ZodIssueCode.custom,
           path: ['proggramme'],
           message: 'proggramme is required when target is specific_programme',
+        });
+      }
+
+      if(data.is_schedule_notification && !data.schedule_time) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ['schedule_time'],
+          message: 'schedule_time is required when is_schedule_notification is true',
         });
       }
     }),

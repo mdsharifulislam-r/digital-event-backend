@@ -92,6 +92,8 @@ const sendPushNotification = async (
       isRead: false,
       filePath: payload.filePath,
       referenceId: payload.referenceId,
+      is_schedule_notification: payload.is_schedule_notification,
+      schedule_time: payload.schedule_time,
       owner: user.id,
       extraPath: payload?.extraPath,
     });

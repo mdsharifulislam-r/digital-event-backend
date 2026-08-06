@@ -10,7 +10,9 @@ export const sendNotifications = async (
   session?: any
 ): Promise<INotification> => {
   const result = await Notification.create([data], { session });
-
+  if(data.is_schedule_notification && data.schedule_time && new Date(data.schedule_time) < new Date()){
+    return result[0];
+  }
 
   const socketIo = global.socketServer;
 

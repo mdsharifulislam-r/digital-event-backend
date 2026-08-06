@@ -44,7 +44,7 @@ const getMyAllVanue = async (user: JwtPayload, query: Record<string, any>) => {
         .filter()
         .sort()
         .paginate()
-    const [vanues, paginationInfo] = await Promise.all([
+    let [vanues, paginationInfo] = await Promise.all([
         vanueQuery.modelQuery.populate([
             {
                 path: "owner",
@@ -61,6 +61,14 @@ const getMyAllVanue = async (user: JwtPayload, query: Record<string, any>) => {
         ]).exec(),
         vanueQuery.getPaginationInfo()
     ])
+
+    vanues = await Promise.all(vanues.map(async (vanue: any) => {
+        const isFavorited = await Favorite.countDocuments({ item: vanue._id, user: user?.id, type: "Venue" }).lean() > 0;
+        return {
+            ...vanue.toObject(),
+            isFavorited
+        }
+    }))
     return { vanues, paginationInfo };
 
 }

@@ -193,6 +193,20 @@ const purchaseProggramme = async (eventId: string, userId: string) => {
         throw new ApiError(StatusCodes.BAD_REQUEST, "You have already purchased this programme");
     }
 
+    if(programme.price_pence <= 0 && programme.is_free){
+        const newBooking = await Booking.create({
+            programme: programme._id,
+            user: userId,
+            event: eventId,
+            status: "confirmed",
+            booking_date: new Date(),
+            payment_status: "paid",
+            price: 0,
+            organization: event.author,
+        })
+        return { message: "Programme purchased successfully" };
+    }
+
     const newBooking = await Booking.create({
         programme: programme._id,
         user: userId,
@@ -209,7 +223,7 @@ const purchaseProggramme = async (eventId: string, userId: string) => {
         payment_method_types: ['card'],
         line_items: [{
             price_data: {
-                currency: 'usd',
+                currency: 'gbp',
                 product_data: {
                     name: `Programme for ${event.title}`,
                     description:`${programme.title} for ${event.title}`,

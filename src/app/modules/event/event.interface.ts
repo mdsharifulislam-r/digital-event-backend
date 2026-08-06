@@ -100,11 +100,11 @@ export type QrScanModel = Model<IQrScan>&{
 export type IFavorite ={
   item: Types.ObjectId;
   user: Types.ObjectId;
-  type:"Event" | "Recommendations" | 'Venue';
+  type:"Event" | "Recommendations" | 'Venue' | 'Artist';
 }
 
 export type FavoriteModel = Model<IFavorite>&{
-  toggleFavorite: (itemId: Types.ObjectId, userId: Types.ObjectId, type:"Event" | "Recommendations"|"Venue"|'Performances') => Promise<{ favorited: boolean }>;
+  toggleFavorite: (itemId: Types.ObjectId, userId: Types.ObjectId, type:"Event" | "Recommendations"|"Venue"|'Performances'|'Artist') => Promise<{ favorited: boolean }>;
 }
 
 

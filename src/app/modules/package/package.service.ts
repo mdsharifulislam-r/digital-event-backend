@@ -17,7 +17,7 @@ const createPackageIntoDB = async (data:IPackage,user:JwtPayload)=>{
     const price = await stripe.prices.create({
         product: product.id,
         unit_amount: Math.round(data.priceMonthly * 100),
-        currency: 'usd',
+        currency: 'gbp',
         recurring:{
             interval:"month"
         }
@@ -56,7 +56,7 @@ const updatePackageToDB = async (id:Types.ObjectId,payload:Partial<IPackage>,use
         const newPrice = await stripe.prices.create({
             product: plan.product,
             unit_amount: Math.round((payload.priceMonthly||0) * 100),
-            currency: 'usd',
+            currency: 'gbp',
             recurring:{
                 interval:"month"
             }

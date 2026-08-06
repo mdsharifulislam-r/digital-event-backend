@@ -101,13 +101,13 @@ export const QrScan = model<IQrScan, QrScanModel>('QrScan', qrScanSchema);
 const favoriteSchema = new Schema<IFavorite, FavoriteModel>({
   item: { type: Schema.Types.ObjectId, required: true,refPath:"type" },
   user: { type: Schema.Types.ObjectId, required: true, ref: 'User' },
-  type: { type: String, enum: ['Event', 'Recommendations','Venue','Performances'], required: true },
+  type: { type: String, enum: ['Event', 'Recommendations','Venue','Performances','Artist'], required: true },
 }, {
   timestamps: true,
 })
 
 favoriteSchema.index({ item: 1, user: 1, type: 1 }, { unique: true });
-favoriteSchema.statics.toggleFavorite = async function(itemId: Types.ObjectId, userId: Types.ObjectId, type:"Event" | "Recommendations"|'Venue'|'Performances') {
+favoriteSchema.statics.toggleFavorite = async function(itemId: Types.ObjectId, userId: Types.ObjectId, type:"Event" | "Recommendations"|'Venue'|'Performances'|'Artist') {
   const existingFavorite = await this.findOne({ item: itemId, user: userId, type });
   if (existingFavorite) {
     await existingFavorite.deleteOne();
