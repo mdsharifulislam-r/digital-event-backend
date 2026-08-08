@@ -22,7 +22,7 @@ const createRecommendation = catchAsync(async (req: Request, res: Response, next
 
 const getRecommendationById = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const id = req.params.id;
-    const result = await RecommendationsServices.getRecommendationById(id);
+    const result = await RecommendationsServices.getRecommendationById(id, req.user);
     sendResponse(res, {
         success: true,
         statusCode: StatusCodes.OK,

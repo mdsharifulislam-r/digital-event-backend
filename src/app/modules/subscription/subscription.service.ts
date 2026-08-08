@@ -16,6 +16,8 @@ import { emailTemplate } from "../../../shared/emailTemplate";
 import { kafkaProducer } from "../../../tools/kafka/kafka-producers/kafka.producer";
 import { INotification } from "../notification/notification.interface";
 import { sendNotificationQueue } from "../../../helpers/notificationHelper";
+import { sendActivity } from "../../../handlers/activityHelper";
+import { ACTIVITY_TYPE } from "../../../enums/activity";
 
 export interface AppleReceiptResponse {
   status: number;
@@ -333,6 +335,54 @@ const cancelSubscription = async (id:string) => {
 
 }
 
+
+const changeSubscriptionPackage = async (userId: string, newPackageId: string) => {
+  const subscription = await Subscription.findOne({ user: userId, status: "active" });
+  if (!subscription) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "You have no active subscription! Please subscribe first.");
+  }
+
+  const newPackage = await Package.findById(newPackageId);
+  if (!newPackage) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Package doesn't exist! Please choose another plan.");
+  }
+
+  await Subscription.findOneAndUpdate({_id:subscription._id,status:"active"},{status:"inactive"});
+  const subscriptionData = {
+    name: newPackage.label,
+    price: newPackage.priceMonthly,
+    startDate: subscription.startDate,
+    endDate: subscription.endDate,
+    txId: `TRX-${Math.floor(Math.random() * 1000000)}`,
+    user: userId,
+    status: "active",
+    package: newPackageId,
+    modules: newPackage.modules,
+    vanues: newPackage.vanues,
+    programmes: newPackage.programmes,
+    is_proggramme_sell: newPackage.is_proggramme_sell
+  };
+
+  const newSubscription = await Subscription.create(subscriptionData);
+  sendNotificationQueue({
+    title: "Subscription Package Changed",
+    message: `Your subscription package has been changed to ${newPackage.label}.`,
+    receiver: [userId as any],
+    isRead: false,
+    filePath: "subscription",
+  })
+  sendActivity({
+    title: "Subscription Package Changed",
+    description: `Your subscription package has been changed to ${newPackage.label}.`,
+    user: userId,
+    type: ACTIVITY_TYPE.SUBSCRIPTION
+  })
+  await User.findOneAndUpdate({ _id: userId }, { $set: { subscription: newSubscription._id } });
+  return newSubscription
+
+}
+
+
 export const SubscriptionService = {
   verifyAppleReceipt,
   getSubscriptionByUser,
@@ -344,5 +394,6 @@ export const SubscriptionService = {
   getSubscriptionDetailsById,
   transactionOfSubscriptionByOtp,
   renewSubscription,
-  cancelSubscription
+  cancelSubscription,
+  changeSubscriptionPackage
 };

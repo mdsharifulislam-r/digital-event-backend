@@ -67,6 +67,9 @@ const getEventById = async (id: string,userId:string,qrCode?:boolean) => {
     QrScan.recordScan(event?._id as any, (event?.author as any)._id as any);
   }
 
+  const isAlreadyProgrammePurchased = await Booking.countDocuments({ programme: event?.programme, user: userId, event: id, payment_status: "paid" }).lean() > 0;
+  (event as any).is_already_programme_purchased = isAlreadyProgrammePurchased;
+
   event!.author = {
     name: (event?.author as any)?.name,
     email: (event?.author as any)?.email,

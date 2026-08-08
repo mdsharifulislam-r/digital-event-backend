@@ -11,7 +11,9 @@ const recommendationsSchema = new Schema<IRecommendations, RecommendationsModel>
   location: { type: String, required: true },
   description: { type: String, required: true },
   website: { type: String, required: true },
-  owner:{type: Schema.Types.ObjectId, ref:'User', required:true}
+  owner:{type: Schema.Types.ObjectId, ref:'User', required:true},
+  total_clicks: { type: Number, default: 0 },
+  total_views: { type: Number, default: 0 },
 }, {
   timestamps: true,
 });

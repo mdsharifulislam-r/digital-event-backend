@@ -147,6 +147,18 @@ const cancelSubscription = catchAsync(async (req: Request, res: Response) => {
 sendResponse(res, response);
 });
 
+const changeSubscriptionPackage = catchAsync(async (req: Request, res: Response) => {
+  const { userId, packageId } = req.body;
+  const subscription = await SubscriptionService.changeSubscriptionPackage(userId, packageId);
+  const response = {
+    success: true,
+    message: "Subscription package changed successfully",
+    data: subscription,
+    statusCode: 200,
+  };
+sendResponse(res, response);
+});
+
 export const SubscriptionController = {
   createSubsciption,
   demoSubscription,
@@ -158,5 +170,6 @@ export const SubscriptionController = {
   getSubscribersUsers,
   transactionByOtp,
   renewSubscription,
-  cancelSubscription
+  cancelSubscription,
+  changeSubscriptionPackage
 };

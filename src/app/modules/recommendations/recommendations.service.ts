@@ -5,6 +5,7 @@ import QueryBuilder from '../../builder/QueryBuilder';
 import { RedisHelper } from '../../../tools/redis/redis.helper';
 import { sendActivity } from '../../../handlers/activityHelper';
 import { ACTIVITY_TYPE } from '../../../enums/activity';
+import { kafkaProducer } from '../../../tools/kafka/kafka-producers/kafka.producer';
 
 const createRecommendation = async (data: Partial<IRecommendations>) => {
   const recommendation = await Recommendations.create(data);
@@ -14,12 +15,16 @@ const createRecommendation = async (data: Partial<IRecommendations>) => {
   return recommendation;
 }
 
-const getRecommendationById = async (id: string) => {
+const getRecommendationById = async (id: string,user:JwtPayload) => {
   const cache = await RedisHelper.redisGet(`recommendation:${id}`);
   if (cache) {
       return cache;
   }
   const recommendation = await Recommendations.findById(id);
+  await kafkaProducer.sendMessage("ad",{
+    type:"recommendations-click",
+    data:{recommendation_id:id,user_id:user.id}
+  })
   await RedisHelper.redisSet(`recommendation:${id}`, recommendation);
   return recommendation;
 }

@@ -11,6 +11,8 @@ export interface IRecommendations {
   description: string;
   website: string;
   owner:Types.ObjectId
+  total_clicks?: number;
+  total_views?: number;
 }
 
 export type RecommendationsModel = Model<IRecommendations>;

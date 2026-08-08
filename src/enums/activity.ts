@@ -6,6 +6,7 @@ export enum ACTIVITY_TYPE {
     OTHER = "Other",
     USER = "User",
     PACKAGE = "Package",
+    SUBSCRIPTION = "Subscription",
     RECOMMENDATION = "Recommendation",
     AD = "Ad"
 }

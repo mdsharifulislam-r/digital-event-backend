@@ -155,7 +155,7 @@ export type TCreateEventFormData = z.infer<
 
 const makeFavoriteZodSchema = z.object({
   body: z.object({
-    type: z.enum(["Event" , "Recommendations","Venue","Performances"]),
+    type: z.enum(["Event" , "Recommendations","Venue","Performances","Artist"]),
   }),
 });
 

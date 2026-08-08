@@ -64,4 +64,17 @@ router.route("/cancel/:id")
   SubscriptionController.cancelSubscription
 )
 
+router.route("/renew/:id")
+.post(
+  auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+  SubscriptionController.renewSubscription
+)
+
+router.route("/change-package")
+.post(
+  auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN),
+  validateRequest(SubscriptionValidation.changeSubscriptionPackageZodSchema),
+  SubscriptionController.changeSubscriptionPackage
+)
+
 export const SubscriptionRoutes = router;
