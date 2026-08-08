@@ -38,5 +38,9 @@ export default {
   },
   elasticSearch: {
     url: process.env.ELASTICSEARCH_URL
+  },
+  urls:{
+    frontend: process.env.FRONTEND_URL,
+    dashboard: process.env.DASHBOARD_URL
   }
 };

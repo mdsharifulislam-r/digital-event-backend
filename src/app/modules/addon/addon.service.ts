@@ -62,8 +62,8 @@ const purchaseAddonToDB = async (id: string,user:JwtPayload) => {
             quantity: 1
         }],
         mode: "payment",
-        success_url: `http://localhost:3000/subscription/success`,
-        cancel_url: `http://localhost:3000/subscription/cancel`,
+        success_url: `${config.frontend}/subscription/success`,
+        cancel_url: `${config.frontend}/subscription/cancel`,
         customer_email: user.email,
         metadata: {
             addonId: addon._id.toString(),

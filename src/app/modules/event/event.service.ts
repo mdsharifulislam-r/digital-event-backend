@@ -12,6 +12,7 @@ import { Booking } from '../booking/booking.model';
 import { Follower, User } from '../user/user.model';
 import { sendActivity } from '../../../handlers/activityHelper';
 import { ACTIVITY_TYPE } from '../../../enums/activity';
+import config from '../../../config';
 
 const createEvent = async (data: Partial<IEvent>) => {
   const event = (await Event.create(data))
@@ -236,8 +237,8 @@ const purchaseProggramme = async (eventId: string, userId: string) => {
             quantity: 1,
         }],
         mode: 'payment',
-        success_url: `http://localhost:3000/purchase-success`,
-        cancel_url: `http://localhost:3000/purchase-cancelled`,
+        success_url: `${config.urls.frontend}/payment/success?type=programme`,
+        cancel_url: `${config.urls.frontend}/payment/cancelled?type=programme`,
         metadata: {
             bookingId: newBooking._id.toString()
         },

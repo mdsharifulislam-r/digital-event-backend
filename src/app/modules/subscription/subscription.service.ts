@@ -129,8 +129,8 @@ const subscribeByStripe = async (packageId: string, user: JwtPayload) => {
       },
     ],
     mode: "subscription",
-    success_url: `http://localhost:3000/subscription/success`,
-    cancel_url: `http://localhost:3000/subscription/cancel`,
+    success_url: `${config.urls.dashboard}/payment/success?type=subscription`,
+    cancel_url: `${config.urls.dashboard}/payment/cancelled?type=subscription`,
     customer_email: userExist.email,
 
   });
