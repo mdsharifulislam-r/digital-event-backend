@@ -16,6 +16,9 @@ export const adConsumer = async () => {
                 case "programmes-click":
                     await ProgrammesHelper.handleProgrammesClickAndView(data.data.programmeId, data.data.userId);
                     break;
+                case "dwell-time":
+                    await AdHandler.handleDwellTimeOfAd(data.data);
+                    break;
             }
         } catch (error) {
             console.log(error);

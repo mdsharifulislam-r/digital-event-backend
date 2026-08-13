@@ -121,7 +121,16 @@ const getAllEvents = async (query: Record<string, any>, user: JwtPayload) => {
     .paginate()
 
   const [events, paginationInfo] = await Promise.all([
-    eventQuery.modelQuery.populate('vanue','name address_line1').exec(),
+    eventQuery.modelQuery.populate([{
+      path:"vanue" ,
+      select: 'name address_line1'
+    },
+    {
+      path:"programme",
+      select: 'title cover_image price_pence'
+    }
+  
+  ]).exec(),
     eventQuery.getPaginationInfo(),
   ]);
 
@@ -151,13 +160,15 @@ const searchEvents = async (query: Record<string, any>,user:JwtPayload) => {
         price: 1,
         event_date: 1,
         interest_count: 1,
+        programme: 1,
+        description_html: 1
     }), query)
     .search(['title', 'category', 'description_html'])
     .filter(['startDate', 'endDate'])
     .sort()
     .paginate();
     let [events, paginationInfo] = await Promise.all([
-        eventQuery.modelQuery.exec(),
+        eventQuery.modelQuery.populate('programme', 'title cover_image price_pence').exec(),
         eventQuery.getPaginationInfo(),
     ]);
 

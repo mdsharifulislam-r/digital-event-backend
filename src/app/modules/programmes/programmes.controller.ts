@@ -155,6 +155,19 @@ const getBookingCountForProgrammes = catchAsync(
   },
 );
 
+
+const getDwellTimeForProgrammes = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const result = await ProgrammesServices.getWeekDaysDwellTime(req.user as any,req.query as any);
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: 'Dwell time for programme retrieved successfully',
+      data: result,
+    });
+  },
+);
+
 export const ProgrammesController = {
   createProgrammes,
   getProgrammesById,
@@ -165,5 +178,6 @@ export const ProgrammesController = {
   getViewsAndClicksGraphData,
   getRevenueGraphData,
   uploadProggrameImages,
-  getBookingCountForProgrammes
+  getBookingCountForProgrammes,
+  getDwellTimeForProgrammes
 };

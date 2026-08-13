@@ -11,7 +11,7 @@ import { sendActivity } from '../../../handlers/activityHelper';
 import { ACTIVITY_TYPE } from '../../../enums/activity';
 import { kafkaProducer } from '../../../tools/kafka/kafka-producers/kafka.producer';
 import { Types } from 'mongoose';
-import { Click } from '../ad/ad.model';
+import { Click, DwellTime } from '../ad/ad.model';
 import { getDateRange } from '../../../helpers/dateTimeHelper';
 import { Event } from '../event/event.model';
 
@@ -161,10 +161,33 @@ const getAnalyticsForProgrammes = async (user: JwtPayload,query:IProgrammesAnaly
     }
   });
 
+  const avgDwellTime = await DwellTime.aggregate([
+    {
+      $match: {
+        item: { $in: query.ids.map(id => new Types.ObjectId(id)) },
+        type: 'Programmes',
+        createdAt: {
+          $gte: dateRange.startDate,
+          $lte: dateRange.endDate,
+        }
+      }
+    },
+    {
+      $group: {
+        _id: null,
+        totalDwellTime: { $avg: "$dwellTime" }
+      }
+    }
+  ]);
+
+  const avgDwellTimek = avgDwellTime.length > 0 ? avgDwellTime[0].totalDwellTime : 0;
+  const dwellTimeInHours = avgDwellTimek  / 60 / 60;
+
   return {
     ctotalClicks: clickViewMatchStage,
     totalViews: clickViewMatchStage,
-    totalSolds
+    totalSolds,
+    avgDwellTime: dwellTimeInHours
   }
 
 }
@@ -464,7 +487,134 @@ const getBookingCountForProgrammes = async (proggramme: Types.ObjectId) => {
   return await Booking.countDocuments({ programme: proggramme, status: 'confirmed' });
 };
 
+const getWeekDaysDwellTime = async (user: JwtPayload, query: IProgrammesAnalytics) => {
+  const dateRange = getDateRange(query.date_range);
 
+  if (!query?.ids?.length) {
+    query.ids = await Programmes.find({ owner: new Types.ObjectId(user.id) }).distinct('_id') as any[];
+  }
+
+  const startDate = new Date(dateRange.startDate);
+  const endDate = new Date(dateRange.endDate);
+  const isYearView = query.date_range === 'thisYear';
+
+  let dwellTimeGraphData: any[] = [];
+
+  if (isYearView) {
+    const aggregationPipeline = [
+      {
+        $match: {
+          item: { $in: query.ids.map((id) => new Types.ObjectId(id)) },
+          type: 'Programmes',
+          createdAt: {
+            $gte: dateRange.startDate,
+            $lte: dateRange.endDate,
+          },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            month: { $month: '$createdAt' },
+          },
+          dwellTime: { $avg: '$dwellTime' },
+        },
+      },
+      {
+        $sort: { '_id.month': 1 },
+      },
+    ];
+
+    const monthData = await DwellTime.aggregate(aggregationPipeline as any);
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+    for (let i = 1; i <= 12; i++) {
+      const foundMonth = monthData.find((m) => m._id.month === i);
+      dwellTimeGraphData.push({
+        month: i,
+        label: monthNames[i - 1],
+        dwellTime: foundMonth?.dwellTime || 0,
+      });
+    }
+  } else {
+    const aggregationPipeline = [
+      {
+        $match: {
+          item: { $in: query.ids.map((id) => new Types.ObjectId(id)) },
+          type: 'Programmes',
+          createdAt: {
+            $gte: dateRange.startDate,
+            $lte: dateRange.endDate,
+          },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            day: { $dayOfMonth: '$createdAt' },
+            month: { $month: '$createdAt' },
+            year: { $year: '$createdAt' },
+          },
+          dwellTime: { $avg: '$dwellTime' },
+        },
+      },
+      {
+        $project: {
+          _id: 0,
+          date: {
+            $dateFromParts: {
+              year: '$_id.year',
+              month: '$_id.month',
+              day: '$_id.day',
+            },
+          },
+          day: '$_id.day',
+          month: '$_id.month',
+          year: '$_id.year',
+          dwellTime: 1,
+        },
+      },
+      {
+        $sort: { date: 1 },
+      },
+    ];
+
+    const dateData = await DwellTime.aggregate(aggregationPipeline as any);
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+    const allDates: Record<string, any> = {};
+    let currentDate = new Date(startDate);
+    while (currentDate <= endDate) {
+      const dateKey = currentDate.toISOString().split('T')[0];
+      const dayOfWeek = currentDate.getDay();
+      allDates[dateKey] = {
+        date: new Date(currentDate),
+        dayOfWeek,
+        label: dayNames[dayOfWeek],
+        dwellTime: 0,
+      };
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    dateData.forEach((item) => {
+      const dateKey = new Date(item.date).toISOString().split('T')[0];
+      if (allDates[dateKey]) {
+        allDates[dateKey].dwellTime = item.dwellTime;
+      }
+    });
+
+    dwellTimeGraphData = Object.values(allDates)
+      .sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime())
+      .map((item: any) => ({
+        date: item.date,
+        dayOfWeek: item.dayOfWeek,
+        label: item.label,
+        dwellTime: item.dwellTime,
+      }));
+  }
+
+  return dwellTimeGraphData;
+};
 
 export const ProgrammesServices = {
   createProgrammes,
@@ -475,5 +625,6 @@ export const ProgrammesServices = {
   getAnalyticsForProgrammes,
   getViewsAndClicksGraphData,
   getRevenueGraphData,
+  getWeekDaysDwellTime,
   getBookingCountForProgrammes
 };

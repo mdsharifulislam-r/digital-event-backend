@@ -1,4 +1,5 @@
-import { Ad, Click } from "./ad.model";
+import { IDwellTime } from "./ad.interface";
+import { Ad, Click, DwellTime } from "./ad.model";
 
 const handleClickAndViewOfAd = async (ad_id: string, user_id: string) => {
     // Check if the user has already clicked or viewed the ad in the last 24 hours
@@ -24,6 +25,12 @@ const handleClickAndViewOfAd = async (ad_id: string, user_id: string) => {
 };
 
 
+const handleDwellTimeOfAd = async (payload:IDwellTime)=>{
+    await DwellTime.create(payload);
+}
+
+
 export const AdHandler = {
-    handleClickAndViewOfAd
+    handleClickAndViewOfAd,
+    handleDwellTimeOfAd
 }

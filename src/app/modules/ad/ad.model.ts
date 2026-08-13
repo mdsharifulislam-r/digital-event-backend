@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import { IAd, AdModel, IClick, ClickModel } from './ad.interface'; 
+import { IAd, AdModel, IClick, ClickModel, IDwellTime, DwellTimeModel } from './ad.interface'; 
 
 const adSchema = new Schema<IAd, AdModel>({
   title: { type: String, required: true },
@@ -31,3 +31,27 @@ const clickSchema = new Schema<IClick, ClickModel>({
 });
 
 export const Click = model<IClick, ClickModel>('Click', clickSchema);
+const dwellTimeSchema = new Schema<IDwellTime, DwellTimeModel>({
+  item: { type: Schema.Types.ObjectId, required: true,refPath:"type" },
+  user: { type: Schema.Types.ObjectId, required: false },
+  type: { type: String, enum: ['Event', 'Recommendations', 'Ad','Programmes'], required: true },
+  dwellTime: { type: Number, required: false,default:0 },
+  startTime: { type: Date, required: true },
+  endTime: { type: Date, required: true },
+}, {
+  timestamps: true
+});
+
+function calculateDwellTime(startTime: Date, endTime: Date): number {
+  const timeDiff = endTime.getTime() - startTime.getTime();
+  return Math.floor(timeDiff / 1000);
+}
+
+dwellTimeSchema.pre('save', function(next) {
+  if (this.startTime && this.endTime) {
+    this.dwellTime = calculateDwellTime(this.startTime, this.endTime);
+  }
+  next();
+});
+
+export const DwellTime = model<IDwellTime, DwellTimeModel>('DwellTime', dwellTimeSchema);

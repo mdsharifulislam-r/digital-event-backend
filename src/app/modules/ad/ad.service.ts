@@ -1,5 +1,5 @@
 import { JwtPayload } from 'jsonwebtoken';
-import { AdModel, IAd } from './ad.interface';
+import { AdModel, IAd, IDwellTime } from './ad.interface';
 import { ACTIVITY_TYPE } from '../../../enums/activity';
 import { sendActivity } from '../../../handlers/activityHelper';
 import { Ad } from './ad.model';
@@ -138,6 +138,15 @@ const getAnalaytics = async (user:JwtPayload) => {
     };
 }
 
+
+
+const calculateDwellTime = async (payload:IDwellTime)=>{
+    await kafkaProducer.sendMessage("ad",{
+        type:"dwell-time",
+        data:payload
+    })
+}
+
 export const AdServices = {
     createAdToDB,
     getAllAdsFromDB,
@@ -145,5 +154,6 @@ export const AdServices = {
     deleteAdFromDB,
     updateAdToDB,
     getBulkAdsFromDB,
-    getAnalaytics
+    getAnalaytics,
+    calculateDwellTime
 };

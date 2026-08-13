@@ -4,6 +4,7 @@ import auth from '../../middlewares/auth';
 import validateRequest from '../../middlewares/validateRequest';
 import { AdValidations } from './ad.validation';
 import fileUploadHandler from '../../middlewares/fileUploadHandler';
+import tempAuth from '../../middlewares/tempAuth';
 
 const router = express.Router();
 
@@ -16,6 +17,10 @@ router.route("/analytics")
 
 router.route("/bulk-gets")
     .post(auth(), validateRequest(AdValidations.getBulkAdZodSchema), AdController.getBulkAds)
+
+
+router.route("/dwell-time")
+    .post(tempAuth(), validateRequest(AdValidations.calculateDwellTimeZodSchema), AdController.calculateDwellTime)
 
 router.route("/:id")
     .patch(auth(),fileUploadHandler(),validateRequest(AdValidations.updateAdZodSchema),AdController.updateAd)

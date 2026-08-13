@@ -28,3 +28,16 @@ export type IClick = {
 
 export type ClickModel = Model<IClick>;
 
+
+
+export type IDwellTime = {
+  item: Types.ObjectId;
+  user: Types.ObjectId;
+  type:"Event" | "Recommendations" | "Ad" | "Programmes";
+  dwellTime: number;
+  startTime: Date;
+  endTime: Date;
+}
+
+
+export type DwellTimeModel = Model<IDwellTime>

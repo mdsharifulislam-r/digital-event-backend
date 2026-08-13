@@ -92,6 +92,18 @@ const getAnalytics = catchAsync(async (req: Request, res: Response, next: NextFu
 });
 
 
+const calculateDwellTime = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const payload = req.body;
+    payload.user = req.user.id;
+    await AdServices.calculateDwellTime(payload);
+    sendResponse(res, {
+        success: true,
+        statusCode: StatusCodes.OK,
+        message: 'Dwell time calculated successfully',
+    });
+});
+
+
 
 
 export const AdController = {
@@ -101,5 +113,6 @@ export const AdController = {
     deleteAd,
     updateAd,
     getBulkAds,
-    getAnalytics
+    getAnalytics,
+    calculateDwellTime
 };

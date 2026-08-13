@@ -23,6 +23,8 @@ router.route('/graph-data')
 router.route('/revenue-graph-data')
     .get(auth(USER_ROLES.ORGANIZATION),validateRequest(ProgrammesValidations.getAnalyticsForProgrammesSchema),ProgrammesController.getRevenueGraphData);
 
+router.route('/dwell-time-graph-data')
+    .get(auth(USER_ROLES.ORGANIZATION),validateRequest(ProgrammesValidations.getAnalyticsForProgrammesSchema),ProgrammesController.getDwellTimeForProgrammes);
 
 router.post('/upload-images',auth(USER_ROLES.ORGANIZATION),fileUploadHandler(),ProgrammesController.uploadProggrameImages);
 

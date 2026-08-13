@@ -29,8 +29,18 @@ const getBulkAdZodSchema = z.object({
     }),
 });
 
+const calculateDwellTimeZodSchema = z.object({
+    body: z.object({
+        item: z.string({ required_error: 'Item ID is required' }),
+        type: z.enum(["Event", "Recommendations", "Ad", "Programmes"], { required_error: 'Type is required' }),
+        startTime: z.coerce.date({ required_error: 'Start time is required' }),
+        endTime: z.coerce.date({ required_error: 'End time is required' }),
+    }),
+});
+
 export const AdValidations = {
     createAdZodSchema,
     updateAdZodSchema,
-    getBulkAdZodSchema
+    getBulkAdZodSchema,
+    calculateDwellTimeZodSchema
 };
