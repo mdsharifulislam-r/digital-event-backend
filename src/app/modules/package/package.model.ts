@@ -73,7 +73,10 @@ const packageSchema = new mongoose.Schema<IPackage,PackageModel>({
     },
     minimum_programme_price: {
         type: Number,
-    }
+    },
+    download_fee_price: {
+        type: Number,
+    },
 
 },{
     timestamps: true

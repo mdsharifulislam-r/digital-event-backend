@@ -19,6 +19,7 @@ export type IPackage = {
   is_proggramme_sell: boolean;
   minimum_programme_price?: number;
   recommended?: boolean;
+  download_fee_price?: number;
 };
 
 export type PackageModel = Model<IPackage>;

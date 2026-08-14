@@ -14,6 +14,7 @@ import { Types } from 'mongoose';
 import { RedisHelper } from '../../../tools/redis/redis.helper';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { kafkaProducer } from '../../../tools/kafka/kafka-producers/kafka.producer';
+import { Booking } from '../booking/booking.model';
 
 const createUserToDB = async (payload: Partial<any>, res: Response) => {
   const isExist = await User.findOne({ email: payload.email });
@@ -109,10 +110,41 @@ const getAllUsers = async (query: Record<string, any>) => {
     .filter()
     .sort()
     .paginate();
-  const [users, paginationInfo] = await Promise.all([
+
+  let [users, paginationInfo] = await Promise.all([
     userQuery.modelQuery.exec(),
     userQuery.getPaginationInfo(),
   ]);
+  users = await Promise.all(
+    users.map(async (user: any) => {
+      const total_spents = await Booking.aggregate([
+        {
+          $match: {
+            user: new Types.ObjectId(user._id),
+            status: 'confirmed',
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            total_spents: { $sum: '$price' },
+          },
+        },
+      ])
+      const sepents = total_spents.length > 0 ? total_spents[0].total_spents : 0;
+      const purchase_proggrames = await Booking.find({ user: new Types.ObjectId(user._id), status: 'confirmed' }).select('programme createdAt price').populate([
+        {
+          path: 'programme',
+          select: 'title cover_image'
+        }
+      ])
+      return {
+        ...user.toObject(),
+        sepents,
+        purchase_proggrames
+      }
+    })
+  )
   return { users, paginationInfo };
 }
 
