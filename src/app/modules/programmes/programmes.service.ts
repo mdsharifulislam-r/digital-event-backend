@@ -1,7 +1,7 @@
 import { JwtPayload } from 'jsonwebtoken';
 import QueryBuilder from '../../builder/QueryBuilder';
-import { IProgrammes, IProgrammesAnalytics, ProgrammesModel } from './programmes.interface';
-import { Programmes } from './programmes.model';
+import { IPollPayload, IProgrammes, IProgrammesAnalytics, IUserThoughts, ProgrammesModel } from './programmes.interface';
+import { Poll, PollAnswer, Programmes, UserThoughts } from './programmes.model';
 import { RedisHelper } from '../../../tools/redis/redis.helper';
 import { Booking } from '../booking/booking.model';
 import { USER_ROLES } from '../../../enums/user';
@@ -10,10 +10,11 @@ import { StatusCodes } from 'http-status-codes';
 import { sendActivity } from '../../../handlers/activityHelper';
 import { ACTIVITY_TYPE } from '../../../enums/activity';
 import { kafkaProducer } from '../../../tools/kafka/kafka-producers/kafka.producer';
-import { Types } from 'mongoose';
+import mongoose, { Types } from 'mongoose';
 import { Click, DwellTime } from '../ad/ad.model';
 import { getDateRange } from '../../../helpers/dateTimeHelper';
 import { Event } from '../event/event.model';
+import { sendNotificationQueue } from '../../../helpers/notificationHelper';
 
 const createProgrammes = async (payload: IProgrammes): Promise<IProgrammes> => {
   const createdProgrammes = await Programmes.create(payload);
@@ -24,6 +25,10 @@ const createProgrammes = async (payload: IProgrammes): Promise<IProgrammes> => {
   );
   await RedisHelper.keyDelete(`programmes_all:*`); // Invalidate the cache for all programmes
 
+  await kafkaProducer.sendMessage("proggrames",{
+    type:"create-poll",
+    data:{id:createdProgrammes._id}
+  })
 
   if(createdProgrammes.status=="published"){
     sendActivity({title:"New Programme Created",description:`Created programme ${createdProgrammes?.title}`,user:createdProgrammes?.owner,type:ACTIVITY_TYPE.PROGRAMME})
@@ -616,6 +621,158 @@ const getWeekDaysDwellTime = async (user: JwtPayload, query: IProgrammesAnalytic
   return dwellTimeGraphData;
 };
 
+
+const createPollFromProggrames = async (programmesId: string) => {
+  try {
+    const programmes = await Programmes.findById(programmesId).lean()
+    if (!programmes) {
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Programmes not found');
+    }
+
+    await Promise.all(
+      programmes.pages.map(async (page) => {
+       return await Promise.all(
+         page.blocks.map(async (block:any) => {
+
+          if(block.type=="poll"){
+            await Poll.create({
+              id: block.id,
+              question: block.data.question,
+              programme: programmesId,
+            })
+          }
+         })
+       )
+    }))
+    
+  } catch (error) {
+    console.log(error);
+  }
+}
+
+
+const answerPoll = async (payload:IPollPayload)=>{
+  try {
+    const poll = await Poll.findOne({id:payload.poll_id}).lean()
+    if(!poll){
+      throw new ApiError(StatusCodes.NOT_FOUND, 'Poll not found')
+    }
+    const existPollAnswer = await PollAnswer.findOne({poll:poll._id,user:payload.user}).lean()
+    if(existPollAnswer){
+      await PollAnswer.findOneAndUpdate({_id:existPollAnswer._id},payload)
+    }else{
+      await PollAnswer.create({poll:poll._id,user:payload.user,answer:payload.answer,answer_id:payload.answer_id,proggrame:poll.programme})
+    }
+  } catch (error) {
+    
+  }
+}
+
+
+const submitUserThoughts = async (payload:IUserThoughts)=>{
+  const userThoughts = await UserThoughts.create(payload)
+  sendNotificationQueue({
+    title:`A new share has been submitted`,
+  message:`A new share has been submitted`,
+  isRead:false,
+  filePath:"support",
+  referenceId:userThoughts._id
+  })
+  return userThoughts
+}
+
+
+const changeChangeStatusOfUserThoughts = async (id:string,payload:Partial<IUserThoughts>)=>{
+  const userThoughts = await UserThoughts.findOneAndUpdate({_id:id},payload)
+  return userThoughts  
+}
+
+const getToughtsOfProgrammes = async (programmesId:string,query:Record<string, any>)=>{
+  const userThoughts = new QueryBuilder(UserThoughts.find({proggrame:programmesId}),query).search(['thought']).filter().sort().paginate()
+  const [thoughts,paginationInfo] = await Promise.all([userThoughts.modelQuery.populate('user','name emaill image').exec(),userThoughts.getPaginationInfo()])
+  return {thoughts,paginationInfo}
+}
+
+const getPollsInformationOfProgrammes = async (programmesId:string)=>{
+  const polls = await Poll.find({programme:programmesId}).lean()
+  return polls
+}
+
+const getPollAnswersByPollId = async (pollId: string) => {
+  const pollAnswers = await PollAnswer.aggregate([
+    {
+      $match: {
+        poll: new mongoose.Types.ObjectId(pollId),
+      },
+    },
+    {
+      $group: {
+        _id: '$answer_id',
+        answer: { $first: '$answer' },
+        count: { $sum: 1 },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        totalVotes: { $sum: '$count' },
+        answers: {
+          $push: {
+            answer_id: '$_id',
+            answer: '$answer',
+            count: '$count',
+          },
+        },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        totalVotes: 1,
+        answers: {
+          $map: {
+            input: '$answers',
+            as: 'answer',
+            in: {
+              answer_id: '$$answer.answer_id',
+              answer: '$$answer.answer',
+              count: '$$answer.count',
+              percentage: {
+                $multiply: [
+                  {
+                    $divide: ['$$answer.count', '$totalVotes'],
+                  },
+                  100,
+                ],
+              },
+            },
+          },
+        },
+      },
+    },
+    {
+      $unwind: '$answers',
+    },
+    {
+      $replaceRoot: { newRoot: '$answers' },
+    },
+  ]);
+
+  return pollAnswers;
+};
+
+const getsAnalayticsForProgrammes = async (programmesId:string)=>{
+  const totalPoll = await Poll.countDocuments({programme:programmesId})
+  const totalPollAnswer = await PollAnswer.countDocuments({proggrame:programmesId})
+  const totalUserThoughts = await UserThoughts.countDocuments({proggrame:programmesId})
+
+  return {totalPoll,totalPollAnswer,totalUserThoughts}
+}
+
+
+
+
+
 export const ProgrammesServices = {
   createProgrammes,
   getProgrammesById,
@@ -626,5 +783,13 @@ export const ProgrammesServices = {
   getViewsAndClicksGraphData,
   getRevenueGraphData,
   getWeekDaysDwellTime,
-  getBookingCountForProgrammes
+  getBookingCountForProgrammes,
+  createPollFromProggrames,
+  answerPoll,
+  getPollAnswersByPollId,
+  submitUserThoughts,
+  changeChangeStatusOfUserThoughts,
+  getToughtsOfProgrammes,
+  getPollsInformationOfProgrammes,
+  getsAnalayticsForProgrammes
 };

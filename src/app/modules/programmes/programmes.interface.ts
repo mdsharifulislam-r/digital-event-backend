@@ -365,4 +365,42 @@ export interface IProgrammesAnalytics {
   ids: string[];
   date_range:"last7Days" | "last30Days" | "thisYear";
 }
- 
+
+
+export type IPoll = {
+  programme: Types.ObjectId;
+  question: string;
+  id:string;
+  response:number
+}
+
+export type PollModel = Model<IPoll>;
+
+
+export type IPollAnswer = {
+  poll: Types.ObjectId;
+  user: Types.ObjectId;
+  answer: string;
+  answer_id: string;
+  proggrame: Types.ObjectId;
+}
+
+
+export type PollAnswerModel = Model<IPollAnswer>;
+
+export interface IPollPayload {
+  poll_id: string;
+  answer_id: string;
+  answer: string;
+  user: string;
+}
+
+export interface IUserThoughts{
+  proggrame: Types.ObjectId;
+  user: Types.ObjectId;
+  thought: string;
+  is_read: boolean;
+  is_archived: boolean;
+}
+
+export type UserThoughtsModel = Model<IUserThoughts>;

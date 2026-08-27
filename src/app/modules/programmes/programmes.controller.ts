@@ -4,6 +4,7 @@ import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 import { StatusCodes } from 'http-status-codes';
 import { getSingleFilePath } from '../../../shared/getFilePath';
+import { kafkaProducer } from '../../../tools/kafka/kafka-producers/kafka.producer';
 const createProgrammes = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const payload = req.body;
@@ -168,6 +169,108 @@ const getDwellTimeForProgrammes = catchAsync(
   },
 );
 
+
+const answerPoll = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const payload = req.body;
+    payload.user = req.user?.id
+    await kafkaProducer.sendMessage("proggrames",{
+      type:"answer-poll",
+      data:payload
+    })
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: 'Poll answer submitted successfully',
+      data: payload,
+    });
+  },
+);
+
+
+const submitUserThoughts = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const payload = req.body;
+    payload.user = req.user?.id
+    const result = await ProgrammesServices.submitUserThoughts(payload);
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: 'User thoughts submitted successfully',
+      data: result,
+    });
+  },
+);
+
+const changeChangeStatusOfUserThoughts = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const id = req.params.id;
+    const payload = req.body;
+    const result = await ProgrammesServices.changeChangeStatusOfUserThoughts(id,payload);
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: 'User thoughts status changed successfully',
+      data: result,
+    });
+  },
+)
+
+const getToughtsOfProgrammes = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const programmesId = req.params.id;
+    const query = req.query;
+    const result = await ProgrammesServices.getToughtsOfProgrammes(programmesId,query as any);
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: 'Programmes toughts retrieved successfully',
+      data: result.thoughts,
+      pagination: result.paginationInfo
+    });
+  },
+)
+
+
+const getPollsInformationOfProgrammes = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const programmesId = req.params.id;
+    const result = await ProgrammesServices.getPollsInformationOfProgrammes(programmesId);
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: 'Programmes polls retrieved successfully',
+      data: result,
+    });
+  },
+)
+
+const getPollAnswersByPollId = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const pollId = req.params.id;
+    const result = await ProgrammesServices.getPollAnswersByPollId(pollId);
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: 'Poll answers retrieved successfully',
+      data: result,
+    });
+  },
+)
+
+const getsAnalayticsForProgrammes = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const programmesId = req.params.id;
+    const result = await ProgrammesServices.getsAnalayticsForProgrammes(programmesId);
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: 'Programmes analytics retrieved successfully',
+      data: result,
+    });
+  },
+)
+
 export const ProgrammesController = {
   createProgrammes,
   getProgrammesById,
@@ -179,5 +282,12 @@ export const ProgrammesController = {
   getRevenueGraphData,
   uploadProggrameImages,
   getBookingCountForProgrammes,
-  getDwellTimeForProgrammes
+  getDwellTimeForProgrammes,
+  answerPoll,
+  submitUserThoughts,
+  changeChangeStatusOfUserThoughts,
+  getToughtsOfProgrammes,
+  getPollsInformationOfProgrammes,
+  getPollAnswersByPollId,
+  getsAnalayticsForProgrammes
 };

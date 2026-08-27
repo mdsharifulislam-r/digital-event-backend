@@ -7,6 +7,7 @@ import { Subscription } from '../subscription/subscription.model';
 import stripe from '../../../config/stripe';
 import { sendActivity } from '../../../handlers/activityHelper';
 import { ACTIVITY_TYPE } from '../../../enums/activity';
+import config from '../../../config';
 
 
 const createAddonToDB = async (addonData: IAddon,user:JwtPayload): Promise<IAddon> => {
@@ -62,8 +63,8 @@ const purchaseAddonToDB = async (id: string,user:JwtPayload) => {
             quantity: 1
         }],
         mode: "payment",
-        success_url: `${config.frontend}/subscription/success`,
-        cancel_url: `${config.frontend}/subscription/cancel`,
+        success_url: `${config.urls.frontend}/subscription/success`,
+        cancel_url: `${config.urls.frontend}/subscription/cancel`,
         customer_email: user.email,
         metadata: {
             addonId: addon._id.toString(),

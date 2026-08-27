@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import { IProgrammes, ProgrammesModel } from './programmes.interface';
+import { IPoll, IPollAnswer, IProgrammes, IUserThoughts, PollAnswerModel, PollModel, ProgrammesModel, UserThoughtsModel } from './programmes.interface';
 import { Venue } from '../vanue/vanue.model';
 import { Event } from '../event/event.model';
 
@@ -129,3 +129,58 @@ export const Programmes = model<IProgrammes, ProgrammesModel>(
   'Programmes',
   programmesSchema,
 );
+
+
+const pollSchema = new Schema<IPoll,PollModel>({
+  programme: { type: Schema.Types.ObjectId, required: true, ref: 'Programmes' },
+  question: { type: String, required: true },
+  id: { type: String, required: true },
+  response: { type: Number, default: 0 },
+},{
+  timestamps: true
+})
+
+pollSchema.index({ programme: 1 });
+pollSchema.index({ id: 1 });
+
+
+export const Poll = model<IPoll, PollModel>('Poll', pollSchema);
+
+
+const pollAnswerSchema = new Schema<IPollAnswer,PollAnswerModel>({
+  poll: { type: Schema.Types.ObjectId, required: true, ref: 'Poll' },
+  user: { type: Schema.Types.ObjectId, required: true, ref: 'User' },
+  answer: { type: String, required: true },
+  answer_id: { type: String, required: true },
+  proggrame: { type: Schema.Types.ObjectId, required: true, ref: 'Programmes' },
+},{
+  timestamps: true
+})
+
+pollAnswerSchema.index({ poll: 1 });
+pollAnswerSchema.index({ user: 1 });
+pollAnswerSchema.index({ proggrame: 1 });
+pollAnswerSchema.index({ answer_id: 1 });
+pollAnswerSchema.index({user:1,poll:1});
+
+pollAnswerSchema.pre('save',async function (next) {
+  await Poll.findOneAndUpdate({_id:this.poll},{$inc:{response:1}})
+  next();
+})
+
+export const PollAnswer = model<IPollAnswer, PollAnswerModel>('PollAnswer', pollAnswerSchema);
+
+
+
+const userThoughtsSchema = new Schema<IUserThoughts,UserThoughtsModel>({
+  user: { type: Schema.Types.ObjectId, required: true, ref: 'User' },
+  thought: { type: String, required: true },
+  is_archived: { type: Boolean, default: false },
+  is_read: { type: Boolean, default: false },
+	proggrame: { type: Schema.Types.ObjectId, required: true, ref: 'Programmes' },
+},{
+  timestamps: true
+})
+
+
+export const UserThoughts = model<IUserThoughts, UserThoughtsModel>('UserThoughts', userThoughtsSchema);

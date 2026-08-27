@@ -31,6 +31,26 @@ router.post('/upload-images',auth(USER_ROLES.ORGANIZATION),fileUploadHandler(),P
 router.route('/booking-count/:id')
     .get(auth(USER_ROLES.ORGANIZATION),ProgrammesController.getBookingCountForProgrammes);
 
+router.route("/answer-poll")
+    .post(auth(),validateRequest(ProgrammesValidations.answerPollSchema),ProgrammesController.answerPoll);
+
+router.route("/polls/:id")
+    .get(auth(),ProgrammesController.getPollsInformationOfProgrammes);
+
+router.route("/polls/:id/answers")
+    .get(auth(),ProgrammesController.getPollAnswersByPollId);
+
+router.route("/polls-thoughts-analytics/:id")
+    .get(auth(USER_ROLES.ORGANIZATION),ProgrammesController.getsAnalayticsForProgrammes);
+
+router.post('/user-thoughts',validateRequest(ProgrammesValidations.submitThoughtsSchema),auth(),ProgrammesController.submitUserThoughts);
+
+router.route('/user-thoughts/:id')
+    .get(auth(USER_ROLES.ORGANIZATION),ProgrammesController.getToughtsOfProgrammes)
+    .patch(auth(USER_ROLES.ORGANIZATION),ProgrammesController.changeChangeStatusOfUserThoughts);
+
+
+
 router.route('/:id')
     .get(auth(),ProgrammesController.getProgrammesById)
     .patch(auth(USER_ROLES.ORGANIZATION),ProgrammesController.updateProgrammes)
