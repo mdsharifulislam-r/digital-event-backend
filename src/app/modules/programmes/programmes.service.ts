@@ -639,13 +639,15 @@ const createPollFromProggrames = async (programmesId: string) => {
          page.blocks.map(async (block:any) => {
 
           if(block.type=="poll"){
-            const existPoll = await Poll.findOne({id:block.id}).lean()
+            console.log(block);
+            const existPoll = await Poll.findOne({id:block.data.id}).lean()
+            console.log(existPoll);
             if(existPoll){
-              await Poll.findOneAndUpdate({id:block.id},{...block,programme:programmesId})
+              await Poll.findOneAndUpdate({id:block.data.id},{id:block.data.id,question:block.data.question,programme:programmesId})
               return
             }
             await Poll.create({
-              id: block.id,
+              id: block.data.id,
               question: block.data.question,
               programme: programmesId,
             })
