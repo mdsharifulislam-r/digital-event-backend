@@ -41,7 +41,7 @@ router.route("/polls/:id/answers")
     .get(auth(),ProgrammesController.getPollAnswersByPollId);
 
 router.route("/polls-thoughts-analytics/:id")
-    .get(auth(USER_ROLES.ORGANIZATION),ProgrammesController.getsAnalayticsForProgrammes);
+    .get(auth(),ProgrammesController.getsAnalayticsForProgrammes);
 
 router.post('/user-thoughts',validateRequest(ProgrammesValidations.submitThoughtsSchema),auth(),ProgrammesController.submitUserThoughts);
 

@@ -699,6 +699,11 @@ const getPollsInformationOfProgrammes = async (programmesId:string)=>{
 }
 
 const getPollAnswersByPollId = async (pollId: string) => {
+  const isMongoObjectId = mongoose.Types.ObjectId.isValid(pollId);
+  if(!isMongoObjectId){
+    const poll = await Poll.findOne({id:pollId}).lean()
+    pollId = poll?._id! as any
+  }
   const pollAnswers = await PollAnswer.aggregate([
     {
       $match: {
