@@ -641,7 +641,7 @@ const createPollFromProggrames = async (programmesId: string) => {
           if(block.type=="poll"){
             const existPoll = await Poll.findOne({id:block.id}).lean()
             if(existPoll){
-              await Poll.findOneAndUpdate({id:block.id},block)
+              await Poll.findOneAndUpdate({id:block.id},{...block,programme:programmesId})
               return
             }
             await Poll.create({
