@@ -96,6 +96,10 @@ const updateProgrammes = async (
   if (updatedProgrammes) {
     await RedisHelper.redisSet(`programmes:${id}`, updatedProgrammes);
   }
+    await kafkaProducer.sendMessage("proggrames",{
+    type:"create-poll",
+    data:{id:updatedProgrammes?._id}
+  })
   return updatedProgrammes;
 };
 
@@ -635,6 +639,11 @@ const createPollFromProggrames = async (programmesId: string) => {
          page.blocks.map(async (block:any) => {
 
           if(block.type=="poll"){
+            const existPoll = await Poll.findOne({id:block.id}).lean()
+            if(existPoll){
+              await Poll.findOneAndUpdate({id:block.id},block)
+              return
+            }
             await Poll.create({
               id: block.id,
               question: block.data.question,
