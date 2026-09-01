@@ -18,18 +18,18 @@ import { sendNotificationQueue } from '../../../helpers/notificationHelper';
 import { Subscription } from '../subscription/subscription.model';
 
 const createProgrammes = async (payload: IProgrammes): Promise<IProgrammes> => {
-  const subscriptionUser = await Subscription.findOne({ user: payload.owner, status: "active" }).lean();
-  if (!subscriptionUser) {
-    throw new ApiError(StatusCodes.BAD_REQUEST, "You need an active subscription to create a programme.");
-  }
+  // const subscriptionUser = await Subscription.findOne({ user: payload.owner, status: "active" }).lean();
+  // if (!subscriptionUser) {
+  //   throw new ApiError(StatusCodes.BAD_REQUEST, "You need an active subscription to create a programme.");
+  // }
 
-  if(!subscriptionUser.is_proggramme_sell){
-    throw new ApiError(StatusCodes.BAD_REQUEST, "Your subscription plan does not allow you to create programmes.");
-  }
+  // if(!subscriptionUser.is_proggramme_sell){
+  //   throw new ApiError(StatusCodes.BAD_REQUEST, "Your subscription plan does not allow you to create programmes.");
+  // }
 
-  if(subscriptionUser.minimum_programme_price&& subscriptionUser.minimum_programme_price > payload.price_pence){
-    throw new ApiError(StatusCodes.BAD_REQUEST, `Programme price must be greater than or equal to ${subscriptionUser.minimum_programme_price} pence.`);
-  }
+  // if(subscriptionUser.minimum_programme_price&& subscriptionUser.minimum_programme_price > payload.price_pence){
+  //   throw new ApiError(StatusCodes.BAD_REQUEST, `Programme price must be greater than or equal to ${subscriptionUser.minimum_programme_price} pence.`);
+  // }
  
   const createdProgrammes = await Programmes.create(payload);
   
