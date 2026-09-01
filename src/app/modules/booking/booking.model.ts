@@ -12,6 +12,7 @@ const bookingSchema = new Schema<IBooking, BookingModel>({
   organization: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   trx_id: { type: String },
   payment_status: { type: String, enum: ['paid', 'unpaid'], default: 'unpaid' },
+  isDeleted: { type: Boolean, default: false },
 }, {
   timestamps: true,
 });

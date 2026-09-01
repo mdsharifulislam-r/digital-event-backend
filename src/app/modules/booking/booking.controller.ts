@@ -16,6 +16,19 @@ const getMyAllProgrammes = catchAsync(async (req: Request, res: Response, next: 
 });
 
 
+const deleteMyProgrammes = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const id = req.params.id;
+    const result = await BookingServices.deleteMyProgrammes(req.user, id);
+    sendResponse(res, {
+        success: true,
+        statusCode: StatusCodes.OK,
+        message: 'Programmes deleted successfully',
+        data: result,
+    });
+});
+
+
 export const BookingController = {
-    getMyAllProgrammes
+    getMyAllProgrammes,
+    deleteMyProgrammes
 };

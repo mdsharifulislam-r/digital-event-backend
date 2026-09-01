@@ -53,7 +53,7 @@ const getEventById = async (id: string,userId:string,qrCode?:boolean) => {
     },
     {
       path: 'programme',
-      select: 'title cover_image price_pence',
+      select: 'title cover_image price_pence is_free',
     }
   ]).lean();
 
@@ -68,7 +68,7 @@ const getEventById = async (id: string,userId:string,qrCode?:boolean) => {
     QrScan.recordScan(event?._id as any, (event?.author as any)._id as any);
   }
 
-  const isAlreadyProgrammePurchased = await Booking.countDocuments({ programme: event?.programme, user: userId, event: id, payment_status: "paid" }).lean() > 0;
+  const isAlreadyProgrammePurchased = await Booking.countDocuments({ programme: event?.programme, user: userId, event: id, payment_status: "paid",isDeleted:{$ne:true} }).lean() > 0;
   (event as any).is_already_programme_purchased = isAlreadyProgrammePurchased;
 
   event!.author = {
@@ -203,7 +203,7 @@ const purchaseProggramme = async (eventId: string, userId: string) => {
         throw new ApiError(StatusCodes.NOT_FOUND, "Programme not found for this event");
     }
 
-    const booking = await Booking.findOne({programme: programme._id, user: userId, event: eventId,payment_status:"paid"});
+    const booking = await Booking.findOne({programme: programme._id, user: userId, event: eventId,payment_status:"paid",isDeleted:{$ne:true}});
     if(booking){
         throw new ApiError(StatusCodes.BAD_REQUEST, "You have already purchased this programme");
     }

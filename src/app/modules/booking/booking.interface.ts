@@ -7,6 +7,7 @@ export type IBooking = {
   status: 'pending' | 'confirmed' | 'cancelled';
   booking_date: Date;
   price: number;
+  isDeleted: boolean;
   organization: Types.ObjectId;
   trx_id: string;
   payment_status: "paid" | "unpaid"

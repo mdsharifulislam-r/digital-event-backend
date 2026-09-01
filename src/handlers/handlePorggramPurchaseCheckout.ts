@@ -6,6 +6,7 @@ import { TRANSACTION_STATUS } from '../enums/transaction';
 import stripe from '../config/stripe';
 import { sendNotifications } from '../helpers/notificationHelper';
 import { Event } from '../app/modules/event/event.model';
+import { RedisHelper } from '../tools/redis/redis.helper';
 
 export const handleProgrammePurchaseCheckout = async (
   session: Stripe.Checkout.Session,
@@ -43,6 +44,7 @@ export const handleProgrammePurchaseCheckout = async (
         { status: TRANSACTION_STATUS.COMPLETED },
         { session: mongoSession },
       ),
+      RedisHelper.keyDelete(`event:${booking.event}:${booking.user._id}:*`),
     ]);
 
     sendNotifications({
