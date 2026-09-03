@@ -15,6 +15,7 @@ import { RedisHelper } from '../../../tools/redis/redis.helper';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { kafkaProducer } from '../../../tools/kafka/kafka-producers/kafka.producer';
 import { Booking } from '../booking/booking.model';
+import stripe from '../../../config/stripe';
 
 const createUserToDB = async (payload: Partial<any>, res: Response) => {
   const isExist = await User.findOne({ email: payload.email });
@@ -191,6 +192,53 @@ const deleteUserAccount = async (user: JwtPayload, password: string) => {
 
 
 
+const createConnectedAccount = async (user: JwtPayload) => {
+  const userDetails = await User.findOne({ _id: user.id });
+  if (!userDetails) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
+  }
+
+  if (userDetails.stripe_login_link) {
+    return {
+      data: userDetails.stripe_login_link,
+    };
+  }
+
+  const account = await stripe.accounts.create({
+    type: 'express',
+    country: 'US',
+    email: user.email,
+    capabilities: {
+      card_payments: { requested: true },
+      transfers: { requested: true },
+    },
+    business_type: 'individual',
+    individual: {
+      first_name: userDetails.name,
+      email: userDetails.email,
+    },
+    business_profile: {
+      mcc: '7299',
+      product_description: 'Freelance services on demand',
+      url: 'https://yourplatform.com',
+    },
+  });
+
+  const accountLink = await stripe.accountLinks.create({
+    account: account.id,
+    refresh_url: 'https://yourplatform.com/refresh',
+    return_url: 'https://yourplatform.com/return',
+    type: 'account_onboarding',
+  });
+
+  await User.updateOne({ _id: user.id }, { stripe_account_id: account.id });
+  return {
+    data: accountLink.url,
+  };
+};
+
+
+
 export const UserService = {
   createUserToDB,
   getUserProfileFromDB,
@@ -198,5 +246,6 @@ export const UserService = {
   followHost,
   suspendUser,
   getAllUsers,
-  deleteUserAccount
+  deleteUserAccount,
+  createConnectedAccount,
 };

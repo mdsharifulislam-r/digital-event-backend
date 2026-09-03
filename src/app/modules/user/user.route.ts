@@ -38,4 +38,5 @@ router.post("/suspend/:id", auth(USER_ROLES.ADMIN, USER_ROLES.SUPER_ADMIN), vali
 router.route('/upload-file').post(fileUploadHandler(), UserController.uploadFile);
 
 router.delete('/delete-account', auth(),validateRequest(UserValidation.deleteAccountZodSchema) ,UserController.deleteAccount);
+router.post('/create-connected-account', auth(), UserController.createConnectedAccount);
 export const UserRoutes = router;

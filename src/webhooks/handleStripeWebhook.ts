@@ -5,6 +5,7 @@ import { handlePurchaseCheckout } from "../handlers/handlePurchaseCheckout";
 import { handleProgrammePurchaseCheckout } from "../handlers/handlePorggramPurchaseCheckout";
 import { handleSubscriptionCreated } from "../handlers/handleSubscriptionCreated";
 import { handleAddonAttach } from "../handlers/handleAddonAttach";
+import { handleAccountUpdatedEvent } from "../handlers/handleAccountUpdatedEvent";
 
 export const handleStripeWebhook = async (req: Request, res: Response) => {
     try {
@@ -23,6 +24,9 @@ export const handleStripeWebhook = async (req: Request, res: Response) => {
                 break;
             case 'customer.subscription.created':
                 await handleSubscriptionCreated(event.data.object);
+                break;
+            case 'account.updated':
+                await handleAccountUpdatedEvent(event.data.object);
                 break;
             default:
                 console.log(`Unhandled event type ${event.type}`);

@@ -8,7 +8,7 @@ import { UserService } from './user.service';
 const createUser = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const { ...userData } = req.body;
-    const result = await UserService.createUserToDB(userData,res);
+    const result = await UserService.createUserToDB(userData, res);
 
     sendResponse(res, {
       success: true,
@@ -16,7 +16,7 @@ const createUser = catchAsync(
       message: 'User created successfully',
       data: result,
     });
-  }
+  },
 );
 
 const getUserProfile = catchAsync(async (req: Request, res: Response) => {
@@ -36,7 +36,7 @@ const updateProfile = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const user = req.user;
     let image = getSingleFilePath(req.files, 'image');
-    
+
     const data = {
       image,
       ...req.body,
@@ -49,7 +49,7 @@ const updateProfile = catchAsync(
       message: 'Profile updated successfully',
       data: result,
     });
-  }
+  },
 );
 
 const uploadFile = catchAsync(async (req: Request, res: Response) => {
@@ -59,13 +59,13 @@ const uploadFile = catchAsync(async (req: Request, res: Response) => {
     statusCode: StatusCodes.OK,
     message: 'File uploaded successfully',
     data: file,
-  })
+  });
 });
 
 const followHost = catchAsync(async (req: Request, res: Response) => {
   const user = req.user;
-  const { hostId,eventId} = req.body
-  const result = await UserService.followHost(user, hostId,eventId);
+  const { hostId, eventId } = req.body;
+  const result = await UserService.followHost(user, hostId, eventId);
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,
@@ -109,5 +109,27 @@ const deleteAccount = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const createConnectedAccount = catchAsync(
+  async (req: Request, res: Response) => {
+    const user = req.user;
+    const result = await UserService.createConnectedAccount(user);
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: 'Connected account created successfully',
+      data: result,
+    });
+  },
+);
 
-export const UserController = { createUser, getUserProfile, updateProfile, uploadFile, followHost, suspendUser, getAllUsers,deleteAccount };
+export const UserController = {
+  createUser,
+  getUserProfile,
+  updateProfile,
+  uploadFile,
+  followHost,
+  suspendUser,
+  getAllUsers,
+  deleteAccount,
+  createConnectedAccount,
+};

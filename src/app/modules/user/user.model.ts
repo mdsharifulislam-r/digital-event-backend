@@ -92,6 +92,14 @@ const userSchema = new Schema<IUser, UserModal>(
       type: Date,
       default: null,
     },
+    stripe_account_id: {
+      type: String,
+      default: null,
+    },
+    stripe_login_link: {
+      type: String,
+      default: null,
+    },
   },
   { timestamps: true,discriminatorKey: 'role' }
 );

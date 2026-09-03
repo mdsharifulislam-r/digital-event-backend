@@ -15,6 +15,8 @@ export type IUser = {
   suspendedAt?: Date;
   suspendedReason?: string;
   suspendedDays?: number;
+  stripe_account_id?: string;
+  stripe_login_link?: string;
   suspendedUntil?: Date;
   subscription:Types.ObjectId;
   authentication?: {
@@ -40,6 +42,7 @@ export type IOrganization = {
   phone: string;
   use_case : USECASE_PLATFORM,
   followers_count: number;
+
 }
 
 export type OrganizationModal = {

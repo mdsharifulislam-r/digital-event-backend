@@ -4,7 +4,8 @@ import Stripe from 'stripe';
 import stripe from '../config/stripe';
 import ApiError from '../errors/ApiError';
 import mongoose from 'mongoose';
-const User:any = "";
+import { User } from '../app/modules/user/user.model';
+    
 
 export const handleAccountUpdatedEvent = async (data: Stripe.Account) => {
     const session = await mongoose.startSession();
@@ -12,7 +13,7 @@ export const handleAccountUpdatedEvent = async (data: Stripe.Account) => {
     try {
         session.startTransaction();
             // Find the user by Stripe account ID
-    const existingUser = await User.findOne({ 'stripeAccountInfo.accountId': data.id });
+    const existingUser = await User.findOne({ stripe_account_id: data.id }).session(session);
 
     if (!existingUser) {
         return console.log('User not found');
@@ -24,10 +25,8 @@ export const handleAccountUpdatedEvent = async (data: Stripe.Account) => {
 
         // Save Stripe account information to the user record
         await User.findByIdAndUpdate(existingUser?._id, {
-            stripeAccountInfo: {
-                accountId: data.id,
-                loginUrl: loginLink.url,
-            }
+            stripe_account_id: data.id,
+            stripe_login_link: loginLink.url
         },{session});
     }
 
