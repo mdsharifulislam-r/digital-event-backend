@@ -73,3 +73,13 @@ export type ISuspendPayload ={
   days:number;
   reason:string;
 }
+
+
+export type ITempHoldWallet = {
+  userId: Types.ObjectId;
+  amount: number;
+}
+
+export type TempHoldWalletModal = {
+  createTempHoldWallet(userId: Types.ObjectId, amount: number,session?:any): Promise<ITempHoldWallet>;
+} & Model<ITempHoldWallet>;

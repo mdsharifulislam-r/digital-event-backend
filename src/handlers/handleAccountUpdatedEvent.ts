@@ -4,7 +4,7 @@ import Stripe from 'stripe';
 import stripe from '../config/stripe';
 import ApiError from '../errors/ApiError';
 import mongoose from 'mongoose';
-import { User } from '../app/modules/user/user.model';
+import { TempHoldWallet, User } from '../app/modules/user/user.model';
     
 
 export const handleAccountUpdatedEvent = async (data: Stripe.Account) => {
@@ -28,6 +28,17 @@ export const handleAccountUpdatedEvent = async (data: Stripe.Account) => {
             stripe_account_id: data.id,
             stripe_login_link: loginLink.url
         },{session});
+
+        const tempHoldWallet = await TempHoldWallet.findOne({ userId: existingUser._id }).session(session);
+        if (tempHoldWallet?.amount||0>0) {
+            await stripe.transfers.create({
+                amount: Math.round(tempHoldWallet?.amount! * 100), // amount in cents
+                currency: 'usd',
+                destination: data.id!,
+                transfer_group: 'temp_hold_wallet',
+            });
+            await TempHoldWallet.findByIdAndDelete(tempHoldWallet!._id,{session});
+        }
     }
 
         await session.commitTransaction();

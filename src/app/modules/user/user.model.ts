@@ -4,7 +4,7 @@ import { model, Schema, SchemaType, Types } from 'mongoose';
 import config from '../../../config';
 import { ORGANIZATION_TYPE, USECASE_PLATFORM, USER_ROLES } from '../../../enums/user';
 import ApiError from '../../../errors/ApiError';
-import { FaceVerificationModal, FollowerModal, IFaceVerification, IFollower, IOrganization, IUser, OrganizationModal, UserModal } from './user.interface';
+import { FaceVerificationModal, FollowerModal, IFaceVerification, IFollower, IOrganization, ITempHoldWallet, IUser, OrganizationModal, TempHoldWalletModal, UserModal } from './user.interface';
 
 const userSchema = new Schema<IUser, UserModal>(
   {
@@ -235,3 +235,27 @@ followSchema.statics.followUser = async (follower: Types.ObjectId, following: Ty
 }
 
 export const Follower = model<IFollower, FollowerModal>('Follower', followSchema);
+
+
+const tempHoldWalletSchema = new Schema<ITempHoldWallet, TempHoldWalletModal>({
+  userId: {
+    type: Schema.Types.ObjectId,
+    required: true,
+    ref: 'User',
+  },
+  amount: {
+    type: Number,
+    required: true,
+  },
+})
+
+
+tempHoldWalletSchema.index({ userId: 1 });
+tempHoldWalletSchema.statics.createTempHoldWallet = async (userId: Types.ObjectId, amount: number,session?:any) => {
+  const exist = await TempHoldWallet.findOne({ userId });
+  if (exist) {
+    await TempHoldWallet.findByIdAndUpdate(exist._id, { $inc: { amount } }, { new: true,session });
+  }
+  return await TempHoldWallet.create({ userId, amount }, { session });
+}
+export const TempHoldWallet = model<ITempHoldWallet, TempHoldWalletModal>('TempHoldWallet', tempHoldWalletSchema);

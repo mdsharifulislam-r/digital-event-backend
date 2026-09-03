@@ -7,6 +7,7 @@ import stripe from '../config/stripe';
 import { sendNotifications } from '../helpers/notificationHelper';
 import { Event } from '../app/modules/event/event.model';
 import { RedisHelper } from '../tools/redis/redis.helper';
+import { TempHoldWallet, User } from '../app/modules/user/user.model';
 
 export const handleProgrammePurchaseCheckout = async (
   session: Stripe.Checkout.Session,
@@ -28,6 +29,17 @@ export const handleProgrammePurchaseCheckout = async (
       throw new Error('Booking not found');
     }
 
+    const organization = await User.findById(booking.organization).session(mongoSession);
+
+    if (!organization) {
+      throw new Error('Organization not found');
+    }
+
+    const charge = 10 // assuming charge 10% of the booking price as platform fee
+    const chargeAmount = (booking.price * charge) / 100;
+    const transferAmount = booking.price - chargeAmount;
+
+
     await Promise.all([
       Booking.updateOne(
         { _id: bookingId },
@@ -41,11 +53,23 @@ export const handleProgrammePurchaseCheckout = async (
       ),
       Transaction.updateMany(
         { order: bookingId },
-        { status: TRANSACTION_STATUS.COMPLETED },
+        { status: TRANSACTION_STATUS.COMPLETED,platform_charge: chargeAmount, amount: transferAmount },
         { session: mongoSession },
       ),
       RedisHelper.keyDelete(`event:${booking.event}:${booking.user._id}:*`),
     ]);
+
+    if(organization.stripe_login_link){
+      await stripe.transfers.create({
+        amount: Math.round(transferAmount * 100), // amount in cents
+        currency: 'usd',
+        destination: organization.stripe_account_id!,
+        transfer_group: bookingId,
+      })
+    }else {
+      await TempHoldWallet.createTempHoldWallet(organization._id, transferAmount, mongoSession);
+    }
+
 
     sendNotifications({
       title: 'Programme purchase',
