@@ -69,7 +69,7 @@ const getUserProfileFromDB = async (
   user: JwtPayload,
 ): Promise<Partial<IUser>> => {
   const { id } = user;
-  const isExistUser = await User.findOne({ _id: id }).populate('subscription', 'name modules is_proggramme_sell minimum_programme_price endDate').lean();
+  const isExistUser = await User.findOne({ _id: id }).populate('subscription', 'name modules is_proggramme_sell minimum_programme_price endDate download_fee_price').lean();
   if (!isExistUser) {
     throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
   }
