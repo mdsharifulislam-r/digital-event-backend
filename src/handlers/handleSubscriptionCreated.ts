@@ -93,7 +93,8 @@ export const handleSubscriptionCreated = async (event: Stripe.Subscription) => {
       vanues: packageData?.vanues,
       programmes: packageData?.programmes,
       is_proggramme_sell: packageData?.is_proggramme_sell,
-      minimum_programme_price: packageData?.minimum_programme_price
+      minimum_programme_price: packageData?.minimum_programme_price,
+      download_fee_price: packageData?.download_fee_price
     });
 
     await User.findByIdAndUpdate(

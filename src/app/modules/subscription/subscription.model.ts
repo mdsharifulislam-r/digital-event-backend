@@ -62,6 +62,10 @@ const subscriptionSchema = new Schema<ISubscription,SubscriptionModel>({
     type:Number,
     default:0,
   },
+  download_fee_price: {
+    type:Number,
+    default:0,
+  },
 },{
     timestamps:true
 });

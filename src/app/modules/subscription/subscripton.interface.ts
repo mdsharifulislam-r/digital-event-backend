@@ -15,6 +15,7 @@ export type ISubscription = {
     programmes:number,
     is_proggramme_sell:boolean
     minimum_programme_price?:number
+    download_fee_price?:number
 }
 
 export  type SubscriptionModel = Model<ISubscription, Record<string, any>>;
