@@ -50,14 +50,14 @@ services:
   #   networks:
   #   - template-network
 
-  # redis:
-  #   image: redis
-  #   ports:
-  #     - 6379:6379
-  #   volumes:
-  #     - redisdata:/data
-  #   networks:
-  #     - template-network
+  redis:
+    image: redis
+    ports:
+      - 6379:6379
+    volumes:
+      - redisdata:/data
+    networks:
+      - template-network
 
   # elasticsearch:
   #   image: docker.elastic.co/elasticsearch/elasticsearch:8.13.0
@@ -71,9 +71,9 @@ services:
   #   networks:
   #     - template-network
 
-# volumes:
+volumes:
   # mongo_data:
-  # redisdata:
+  redisdata:
   # esdata:
 
 networks:
