@@ -5,5 +5,10 @@ declare global {
     interface Request {
       user: JwtPayload;
     }
+    namespace Multer {
+      interface File {
+        location?: string;
+      }
+    }
   }
 }

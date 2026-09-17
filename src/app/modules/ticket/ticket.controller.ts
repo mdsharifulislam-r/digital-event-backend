@@ -3,11 +3,11 @@ import { TicketServices } from './ticket.service';
 import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 import { StatusCodes } from 'http-status-codes';
-import { getSingleFilePath } from '../../../shared/getFilePath';
+import { uploadPhoto } from '../../../helpers/s3Helper';
 
 const createTicket = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 	const payload = req.body;
-    const file = getSingleFilePath(req.files, 'file');
+    const file = await uploadPhoto(req.files, 'file');
     if(file){
         payload.file = file
     }
@@ -34,7 +34,7 @@ const getTicketById = catchAsync(async (req: Request, res: Response, next: NextF
 const updateTicket = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 	const id = req.params.id;
 	const payload = req.body;
-    const file = getSingleFilePath(req.files, 'file');
+    const file = await uploadPhoto(req.files, 'file');
     if(file){
         payload.file = file
     }

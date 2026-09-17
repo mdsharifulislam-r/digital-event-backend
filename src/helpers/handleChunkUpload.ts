@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import fs from 'fs';
 import path from 'path';
+import { isS3Configured, uploadFile } from './s3Helper';
 
 export const handleChunkUpload = async (req: Request, res: Response) => {
   try {
@@ -21,6 +22,11 @@ export const handleChunkUpload = async (req: Request, res: Response) => {
     fs.appendFileSync(filePath, chunk.buffer);
 
     if (Number(chunkIndex) + 1 === Number(totalChunks)) {
+        if (isS3Configured()) {
+          const result = await uploadFile(`/video/${originalname}`);
+          return res.json(result.url);
+        }
+
         return res.json(`/video/${originalname}`);
     }
 

@@ -3,11 +3,11 @@ import { RecommendationsServices } from './recommendations.service';
 import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 import { StatusCodes } from 'http-status-codes';
-import { getSingleFilePath } from '../../../shared/getFilePath';
+import { uploadPhoto } from '../../../helpers/s3Helper';
 const createRecommendation = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const payload = req.body;
     payload.owner = req.user?.id;
-    const image = getSingleFilePath(req.files, 'image');
+    const image = await uploadPhoto(req.files, 'image');
     if(image){
         payload.image = image;
     }
@@ -34,7 +34,7 @@ const getRecommendationById = catchAsync(async (req: Request, res: Response, nex
 const updateRecommendation = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const id = req.params.id;
     const payload = req.body;
-    const image = getSingleFilePath(req.files, 'image');
+    const image = await uploadPhoto(req.files, 'image');
     if(image){
         payload.image = image;
     }

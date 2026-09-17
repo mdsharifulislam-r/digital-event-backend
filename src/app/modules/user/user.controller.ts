@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import catchAsync from '../../../shared/catchAsync';
-import { getSingleFilePath } from '../../../shared/getFilePath';
+import { uploadPhoto } from '../../../helpers/s3Helper';
 import sendResponse from '../../../shared/sendResponse';
 import { UserService } from './user.service';
 
@@ -35,7 +35,7 @@ const getUserProfile = catchAsync(async (req: Request, res: Response) => {
 const updateProfile = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
     const user = req.user;
-    let image = getSingleFilePath(req.files, 'image');
+    let image = await uploadPhoto(req.files, 'image');
 
     const data = {
       image,
@@ -53,7 +53,7 @@ const updateProfile = catchAsync(
 );
 
 const uploadFile = catchAsync(async (req: Request, res: Response) => {
-  const file = getSingleFilePath(req.files, 'image');
+  const file = await uploadPhoto(req.files, 'image');
   return sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,

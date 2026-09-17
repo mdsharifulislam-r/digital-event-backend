@@ -3,10 +3,10 @@ import { AdServices } from './ad.service';
 import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 import { StatusCodes } from 'http-status-codes';
-import { getSingleFilePath } from '../../../shared/getFilePath';
+import { uploadPhoto } from '../../../helpers/s3Helper';
 
 const createAd = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const image = getSingleFilePath(req.files, 'image');
+    const image = await uploadPhoto(req.files, 'image');
     if(image){
         req.body.imageUrl = image
     }
@@ -57,7 +57,7 @@ const deleteAd = catchAsync(async (req: Request, res: Response, next: NextFuncti
 const updateAd = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const id = req.params.id;
     const payload = req.body;
-    const image = getSingleFilePath(req.files, 'image');
+    const image = await uploadPhoto(req.files, 'image');
     if(image){
         payload.imageUrl = image
     }

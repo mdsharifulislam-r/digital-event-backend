@@ -1,9 +1,10 @@
 import * as faceapi from 'face-api.js';
 import canvas, { Canvas, Image, ImageData } from 'canvas';
 import path from 'path';
-import fs from 'fs';
 import sharp from 'sharp';
+import axios from 'axios';
 import ApiError from '../errors/ApiError';
+import { getS3ObjectBuffer, isS3Configured } from './s3Helper';
 
 // Patch face-api with node-canvas
 faceapi.env.monkeyPatch({ Canvas: Canvas as any, Image: Image as any, ImageData: ImageData as any });
@@ -19,24 +20,52 @@ export const loadModels = async () => {
 };
 
 loadModels();
-// Ensure image is supported by canvas
-const ensureSupportedImage = async (imagePath: string) => {
-  const ext = path.extname(imagePath).toLowerCase();
-  if (!['.jpg', '.jpeg', '.png', '.bmp', '.gif'].includes(ext)) {
-    // Convert to JPEG using sharp
-    const newPath = imagePath.replace(ext, '.jpg');
-    await sharp(imagePath).jpeg().toFile(newPath);
-    return newPath;
+
+const getExtension = (imagePath: string) => {
+  try {
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+      return path.extname(new URL(imagePath).pathname).toLowerCase();
+    }
+  } catch {
+    // fall through
   }
-  return imagePath;
+  return path.extname(imagePath).toLowerCase();
+};
+
+const ensureSupportedImageBuffer = async (buffer: Buffer, imagePath: string) => {
+  const ext = getExtension(imagePath);
+  if (!['.jpg', '.jpeg', '.png', '.bmp', '.gif'].includes(ext)) {
+    return sharp(buffer).jpeg().toBuffer();
+  }
+  return buffer;
+};
+
+const loadImageBuffer = async (imagePath: string) => {
+  if (isS3Configured()) {
+    try {
+      return await getS3ObjectBuffer(imagePath);
+    } catch {
+      // fall back to HTTP or local disk
+    }
+  }
+
+  if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+    const response = await axios.get(imagePath, { responseType: 'arraybuffer' });
+    return Buffer.from(response.data);
+  }
+
+  const filePath = path.join(process.cwd(), 'uploads', imagePath.replace(/^\/+/, ''));
+  return sharp(filePath).toBuffer();
 };
 
 // Detect face and return descriptor
 export const detectFace = async (imagePath: string) => {
   try {
-    const filePath = path.join(process.cwd(), 'uploads', imagePath);
-    const supportedPath = await ensureSupportedImage(filePath);
-    const img = (await canvas.loadImage(supportedPath)) as unknown as HTMLImageElement;
+    const buffer = await ensureSupportedImageBuffer(
+      await loadImageBuffer(imagePath),
+      imagePath,
+    );
+    const img = (await canvas.loadImage(buffer)) as unknown as HTMLImageElement;
 
     const detection = await faceapi
       .detectSingleFace(img)

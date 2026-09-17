@@ -100,6 +100,10 @@ const userSchema = new Schema<IUser, UserModal>(
       type: String,
       default: null,
     },
+    permissions: {
+      type: [String],
+      default: [],
+    },
   },
   { timestamps: true,discriminatorKey: 'role' }
 );

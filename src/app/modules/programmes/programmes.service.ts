@@ -139,12 +139,13 @@ const getAllProgrammes = async (
     initQuery = {};
   }
   const programmesQuery = new QueryBuilder<IProgrammes>(
-    Programmes.find(initQuery),
+    Programmes.find(initQuery,{title:1,category:1,status:1,createdAt:1,updatedAt:1,is_free:1,price_pence:1,cover_image:1}),
     query,
   )
     .search(['title'])
     .filter()
-    .sort();
+    .sort()
+    .paginate()
 
   const [programmes, paginationInfo] = await Promise.all([
     programmesQuery.modelQuery.exec(),
@@ -556,7 +557,7 @@ const getWeekDaysDwellTime = async (user: JwtPayload, query: IProgrammesAnalytic
       dwellTimeGraphData.push({
         month: i,
         label: monthNames[i - 1],
-        dwellTime: foundMonth?.dwellTime || 0,
+        dwellTime: Number((foundMonth?.dwellTime || 0)/60/60).toFixed(2),
       });
     }
   } else {

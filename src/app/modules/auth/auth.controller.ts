@@ -3,7 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 import { AuthService } from './auth.service';
-import { getSingleFilePath } from '../../../shared/getFilePath';
+import { uploadPhoto } from '../../../helpers/s3Helper';
 
 const verifyEmail = catchAsync(async (req: Request, res: Response) => {
   const { ...verifyData } = req.body;
@@ -70,7 +70,7 @@ const changePassword = catchAsync(async (req: Request, res: Response) => {
 const saveFaceDiscriminatorToDB = catchAsync(async (req: Request, res: Response) => {
   const user = req.user;
   const { device_id } = req.body;
-  const image = getSingleFilePath(req.files, 'image');
+  const image = await uploadPhoto(req.files, 'image');
   const discriminator = await AuthService.saveFaceDiscriminatorToDB(user, image!, device_id);
 
   sendResponse(res, {
@@ -83,7 +83,7 @@ const saveFaceDiscriminatorToDB = catchAsync(async (req: Request, res: Response)
 
 const faceLogin = catchAsync(async (req: Request, res: Response) => {
   const { device_id } = req.body;
-  const image = getSingleFilePath(req.files, 'image');
+  const image = await uploadPhoto(req.files, 'image');
   const result = await AuthService.faceLoginToDB(image!, device_id);
 
   sendResponse(res, {

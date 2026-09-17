@@ -3,22 +3,22 @@ import { EventServices } from './event.service';
 import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 import { StatusCodes } from 'http-status-codes';
-import { getMultipleFilesPath, getSingleFilePath } from '../../../shared/getFilePath';
+import { uploadPhoto, uploadPhotos } from '../../../helpers/s3Helper';
 import { ArtistServices } from '../artist/artist.service';
 
 const createEvent = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   const payload = req.body;
   payload.author = req.user?.id;
-  const cover_image = getSingleFilePath(req.files, 'cover_image');
+  const cover_image = await uploadPhoto(req.files, 'cover_image');
   if (cover_image) {
     payload.cover_image = cover_image;
   }
-  const gallery = getMultipleFilesPath(req.files, 'gallery');
+  const gallery = await uploadPhotos(req.files, 'gallery');
   if (gallery?.length || 0 > 0) {
     payload.gallery = gallery;
   }
 
-  const host_image = getSingleFilePath(req.files, 'host_avatar');
+  const host_image = await uploadPhoto(req.files, 'host_avatar');
   if (host_image) {
     payload.host = JSON.parse(payload.host);
     payload.host.avatar_url = host_image;
@@ -32,7 +32,7 @@ const createEvent = catchAsync(async (req: Request, res: Response, next: NextFun
     payload.social = JSON.parse(payload.social);
   }
 
-  if (payload.host) {
+  if (payload.host && typeof payload.host === 'string') {
     payload.host = JSON.parse(payload.host);
   }
 
@@ -59,16 +59,16 @@ const getEventById = catchAsync(async (req: Request, res: Response, next: NextFu
 const updateEvent = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
   const id = req.params.id;
   const payload = req.body;
-  const cover_image = getSingleFilePath(req.files, 'cover_image');
+  const cover_image = await uploadPhoto(req.files, 'cover_image');
   if (cover_image) {
     payload.cover_image = cover_image;
   }
-  const gallery = getMultipleFilesPath(req.files, 'gallery');
+  const gallery = await uploadPhotos(req.files, 'gallery');
   if (gallery?.length || 0 > 0) {
     payload.gallery = gallery;
   }
 
-  const host_image = getSingleFilePath(req.files, 'host_avatar');
+  const host_image = await uploadPhoto(req.files, 'host_avatar');
   if (host_image) {
     payload.host = JSON.parse(payload.host);
     payload.host.avatar_url = host_image;
@@ -82,7 +82,7 @@ const updateEvent = catchAsync(async (req: Request, res: Response, next: NextFun
     payload.social = JSON.parse(payload.social);
   }
 
-  if (payload.host) {
+  if (payload.host && typeof payload.host === 'string') {
     payload.host = JSON.parse(payload.host);
   }
 

@@ -3,12 +3,12 @@ import { VanueServices } from './vanue.service';
 import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 import { StatusCodes } from 'http-status-codes';
-import { getSingleFilePath } from '../../../shared/getFilePath';
+import { uploadPhoto } from '../../../helpers/s3Helper';
 
 const createVanue = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     let payload = req.body;
-    const cover_image = getSingleFilePath(req.files, 'cover_image');
-    const logo_image = getSingleFilePath(req.files, 'logo_image');
+    const cover_image = await uploadPhoto(req.files, 'cover_image');
+    const logo_image = await uploadPhoto(req.files, 'logo_image');
     const jsonPayload = JSON.parse(payload.data);
     
     payload={
@@ -40,8 +40,8 @@ const getVanueById = catchAsync(async (req: Request, res: Response, next: NextFu
 const updateVanue = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const id = req.params.id;
     let payload = req.body;
-    const cover_image = getSingleFilePath(req.files, 'cover_image');
-    const logo_image = getSingleFilePath(req.files, 'logo_image');
+    const cover_image = await uploadPhoto(req.files, 'cover_image');
+    const logo_image = await uploadPhoto(req.files, 'logo_image');
 
     payload = JSON.parse(payload.data);
         if (cover_image) {

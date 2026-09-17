@@ -19,6 +19,7 @@ export type IUser = {
   stripe_login_link?: string;
   suspendedUntil?: Date;
   subscription:Types.ObjectId;
+  permissions: string[];
   authentication?: {
     isResetPassword: boolean;
     oneTimeCode: number;

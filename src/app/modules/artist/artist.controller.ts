@@ -3,13 +3,13 @@ import { ArtistServices } from './artist.service';
 import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../../shared/sendResponse';
 import { StatusCodes } from 'http-status-codes';
-import { getSingleFilePath } from '../../../shared/getFilePath';
+import { uploadPhoto } from '../../../helpers/s3Helper';
 
 const createArtist = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     let payload = req.body;
 
-    const image = getSingleFilePath(req.files, 'image');
-    const cover_image = getSingleFilePath(req.files, 'cover_image');
+    const image = await uploadPhoto(req.files, 'image');
+    const cover_image = await uploadPhoto(req.files, 'cover_image');
 
     if (image) {
         payload.image = image;
@@ -68,8 +68,8 @@ const updateArtist = catchAsync(async (req: Request, res: Response, next: NextFu
     const id = req.params.id;
     let payload = req.body;
 
-    const image = getSingleFilePath(req.files, 'image');
-    const cover_image = getSingleFilePath(req.files, 'cover_image');
+    const image = await uploadPhoto(req.files, 'image');
+    const cover_image = await uploadPhoto(req.files, 'cover_image');
 
     if (image) {
         payload.image = image;
