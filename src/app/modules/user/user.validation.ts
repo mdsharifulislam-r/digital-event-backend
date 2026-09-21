@@ -18,12 +18,12 @@ const createUserZodSchema = z.object({
   }).refine((data) => {
     if (data.role === USER_ROLES.ORGANIZATION) {
       return(
-      (data as any).organization_type !== undefined &&
+      // (data as any).organization_type !== undefined &&
       (data as any).website !== undefined &&
       (data as any).country !== undefined &&
       (data as any).contact_name !== undefined &&
-      (data as any).phone !== undefined &&
-      (data as any).use_case !== undefined
+      (data as any).phone !== undefined
+      // (data as any).use_case !== undefined
       )
     }
     return true

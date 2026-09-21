@@ -149,33 +149,33 @@ export const User = model<IUser, UserModal>('User', userSchema);
 const organizationSchema = new Schema<IOrganization, OrganizationModal>({
   organization_name: {
     type: String,
-    required: true,
+    required: false,
   },
   website: {
     type: String,
-    required: true,
+    required: false,
   },
   contact_name: {
     type: String,
-    required: true,
+    required: false,
   },
   country: {
     type: String,
-    required: true,
+    required: false,
   },
   organization_type: {
     type: String,
     enum: Object.values(ORGANIZATION_TYPE),
-    required: true,
+    required: false,
   },
   phone: {
     type: String,
-    required: true,
+    required: false,
   },
   use_case: {
     type: String,
     enum: Object.values(USECASE_PLATFORM),
-    required: true,
+    required: false,
   },
 
 })

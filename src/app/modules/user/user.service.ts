@@ -1,5 +1,5 @@
 import { StatusCodes } from 'http-status-codes';
-import { JwtPayload } from 'jsonwebtoken';
+import { JwtPayload, Secret } from 'jsonwebtoken';
 import { USER_ROLES } from '../../../enums/user';
 import ApiError from '../../../errors/ApiError';
 import { emailHelper } from '../../../helpers/emailHelper';
@@ -16,6 +16,8 @@ import QueryBuilder from '../../builder/QueryBuilder';
 import { kafkaProducer } from '../../../tools/kafka/kafka-producers/kafka.producer';
 import { Booking } from '../booking/booking.model';
 import stripe from '../../../config/stripe';
+import { jwtHelper } from '../../../helpers/jwtHelper';
+import config from '../../../config';
 
 const createUserToDB = async (payload: Partial<any>, res: Response) => {
   const isExist = await User.findOne({ email: payload.email });
@@ -28,11 +30,12 @@ const createUserToDB = async (payload: Partial<any>, res: Response) => {
     if (!isExist.verified) {
       return await AuthHelper.unverifiedAccountHandle(payload.email!, res);
     }
+    console.log(isExist);
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Email already exist!');
   }
   if (payload.role === USER_ROLES.ORGANIZATION) {
     payload.organization_name = payload.name;
-    payload.verified = true; // Set verified to true for organization users
+    // payload.verified = true; // Set verified to true for organization users
   }
   if (!payload.role) {
     payload.role = USER_ROLES.USER;
@@ -62,7 +65,16 @@ const createUserToDB = async (payload: Partial<any>, res: Response) => {
     { $set: { authentication } },
   );
 
-  return createUser;
+  const accessToken = jwtHelper.createToken(
+    { id: createUser._id, role: createUser.role, email: createUser.email },
+    config.jwt.jwt_secret as Secret,
+    config.jwt?.jwt_expire_in as string,
+  );
+
+  return {
+    accessToken,
+    user: createUser,
+  };
 };
 
 const getUserProfileFromDB = async (
