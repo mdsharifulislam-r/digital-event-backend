@@ -16,14 +16,13 @@ import cryptoToken from '../../../util/cryptoToken';
 import generateOTP from '../../../util/generateOTP';
 import { ResetToken } from '../resetToken/resetToken.model';
 import { FaceVerification, User } from '../user/user.model';
-import { Response } from 'express';
 import { AuthHelper } from './auth.helper';
 import { detectFace, verifyFace } from '../../../helpers/faceVerificationHelper';
 import { sendActivity } from '../../../handlers/activityHelper';
 import { ACTIVITY_TYPE } from '../../../enums/activity';
 
 //login
-const loginUserFromDB = async (payload: ILoginData,res:Response) => {
+const loginUserFromDB = async (payload: ILoginData) => {
   const { email, password } = payload;
   const isExistUser = await User.findOne({ email }).select('+password');
   if (!isExistUser) {
@@ -32,7 +31,7 @@ const loginUserFromDB = async (payload: ILoginData,res:Response) => {
 
   //check verified and status
   if (!isExistUser.verified) {
-   return await AuthHelper.unverifiedAccountHandle(email,res);
+   return await AuthHelper.unverifiedAccountHandle(email);
   }
 
   //check user status

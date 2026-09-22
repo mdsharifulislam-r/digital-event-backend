@@ -9,7 +9,6 @@ import generateOTP from '../../../util/generateOTP';
 import { ISuspendPayload, IUser } from './user.interface';
 import { Follower, Organization, User } from './user.model';
 import { AuthHelper } from '../auth/auth.helper';
-import { Response } from 'express';
 import { Types } from 'mongoose';
 import { RedisHelper } from '../../../tools/redis/redis.helper';
 import QueryBuilder from '../../builder/QueryBuilder';
@@ -19,7 +18,7 @@ import stripe from '../../../config/stripe';
 import { jwtHelper } from '../../../helpers/jwtHelper';
 import config from '../../../config';
 
-const createUserToDB = async (payload: Partial<any>, res: Response) => {
+const createUserToDB = async (payload: Partial<any>) => {
   const isExist = await User.findOne({ email: payload.email });
   if (isExist) {
     if (isExist.status === 'delete')
@@ -28,7 +27,7 @@ const createUserToDB = async (payload: Partial<any>, res: Response) => {
         'You don’t have permission to access this content.It looks like your account has been deactivated.',
       );
     if (!isExist.verified) {
-      return await AuthHelper.unverifiedAccountHandle(payload.email!, res);
+      return await AuthHelper.unverifiedAccountHandle(payload.email!);
     }
     console.log(isExist);
     throw new ApiError(StatusCodes.BAD_REQUEST, 'Email already exist!');
