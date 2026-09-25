@@ -16,6 +16,7 @@ import { getDateRange } from '../../../helpers/dateTimeHelper';
 import { Event } from '../event/event.model';
 import { sendNotificationQueue } from '../../../helpers/notificationHelper';
 import { Subscription } from '../subscription/subscription.model';
+import { User } from '../user/user.model';
 
 const createProgrammes = async (payload: IProgrammes): Promise<IProgrammes> => {
   // const subscriptionUser = await Subscription.findOne({ user: payload.owner, status: "active" }).lean();
@@ -30,6 +31,15 @@ const createProgrammes = async (payload: IProgrammes): Promise<IProgrammes> => {
   // if(subscriptionUser.minimum_programme_price&& subscriptionUser.minimum_programme_price > payload.price_pence){
   //   throw new ApiError(StatusCodes.BAD_REQUEST, `Programme price must be greater than or equal to ${subscriptionUser.minimum_programme_price} pence.`);
   // }
+
+  const userInformation = await User.findOne({ _id: payload.owner }).lean();
+  if (!userInformation) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
+  }
+
+  if(!userInformation.stripe_login_link && payload.status=="published"){
+    throw new ApiError(StatusCodes.BAD_REQUEST, "You need to connect your Stripe account to create a programme.");
+  }
  
   const createdProgrammes = await Programmes.create(payload);
   

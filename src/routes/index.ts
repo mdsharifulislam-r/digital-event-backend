@@ -18,6 +18,7 @@ import { TicketRoutes } from '../app/modules/ticket/ticket.route';
 import { ArtistRoutes } from '../app/modules/artist/artist.route';
 import { FaqRoutes } from '../app/modules/faq/faq.route';
 import { AdminRoutes } from '../app/modules/admin/admin.route';
+import { DisclaimerRoutes } from '../app/modules/disclaimer/disclaimer.route';
 const router = express.Router();
 
 const apiRoutes = [
@@ -96,6 +97,10 @@ const apiRoutes = [
   {
     path:"/admin",
     route:AdminRoutes
+  },
+  {
+    path:"/disclaimer",
+    route:DisclaimerRoutes
   }
 ];
 
