@@ -18,7 +18,7 @@ const createPackage = catchAsync(async (req: Request, res: Response) => {
 
 const getAllPackages = catchAsync(async (req: Request, res: Response) => {
     const user = req.user;
-    const result = await PackageService.getAllPackagesFromDB();
+    const result = await PackageService.getAllPackagesFromDB(req?.user);
     sendResponse(res, {
         statusCode: StatusCodes.OK,
         success: true,

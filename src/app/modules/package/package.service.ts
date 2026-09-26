@@ -40,7 +40,7 @@ const createPackageIntoDB = async (data:IPackage,user:JwtPayload)=>{
 }
 
 const getAllPackagesFromDB = async (user:JwtPayload)=>{
-    const result = await Package.find([USER_ROLES.SUPER_ADMIN,USER_ROLES.ADMIN].includes(user.role) ? {status:{$ne:'delete'}} : {status:'active'})
+    const result = await Package.find([USER_ROLES.SUPER_ADMIN,USER_ROLES.ADMIN].includes(user?.role) ? {status:{$ne:'delete'}} : {status:'active'})
     return result
 
     return result
