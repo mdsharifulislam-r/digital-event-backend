@@ -20,7 +20,7 @@ const packageSchema = new mongoose.Schema<IPackage,PackageModel>({
 
     status: {
         type: String,
-        enum: ['active', 'delete'],
+        enum: ['active', 'delete', 'hide'],
         default: 'active',
     },
     audience: {
@@ -77,6 +77,7 @@ const packageSchema = new mongoose.Schema<IPackage,PackageModel>({
     download_fee_price: {
         type: Number,
     },
+
 
 },{
     timestamps: true

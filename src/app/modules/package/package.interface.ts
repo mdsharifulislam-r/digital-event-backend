@@ -6,7 +6,7 @@ export type IPackage = {
   product?: string;
   label: string;
   short: string;
-  status: 'active' | 'delete';
+  status: 'active' | 'delete' |"hide"
   audience: string;
   modules: number[];
   can_charge: boolean;

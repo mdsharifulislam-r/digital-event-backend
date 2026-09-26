@@ -7,6 +7,7 @@ import { StatusCodes } from "http-status-codes";
 import { JwtPayload } from "jsonwebtoken";
 import { sendActivity } from "../../../handlers/activityHelper";
 import { ACTIVITY_TYPE } from "../../../enums/activity";
+import { USER_ROLES } from "../../../enums/user";
 
 const createPackageIntoDB = async (data:IPackage,user:JwtPayload)=>{
     const product = await stripe.products.create({
@@ -38,8 +39,8 @@ const createPackageIntoDB = async (data:IPackage,user:JwtPayload)=>{
     return result
 }
 
-const getAllPackagesFromDB = async ()=>{
-    const result = await Package.find({status:"active"})
+const getAllPackagesFromDB = async (user:JwtPayload)=>{
+    const result = await Package.find([USER_ROLES.SUPER_ADMIN,USER_ROLES.ADMIN].includes(user.role) ? {status:{$ne:'delete'}} : {status:'active'})
     return result
 
     return result

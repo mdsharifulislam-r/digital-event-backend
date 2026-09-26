@@ -221,7 +221,7 @@ const transactionOfSubscription = async (user: JwtPayload,password: string,query
 
 
 const subscriptionUsers = async (query:Record<string,any>) => {
-  const SubscriptionQuery = new QueryBuilder(Subscription.find(), query).paginate().sort()
+  const SubscriptionQuery = new QueryBuilder(Subscription.find(), query).paginate().sort().filter()
 
   const [subscriptions,pagination] = await Promise.all([
     SubscriptionQuery.modelQuery.populate([
