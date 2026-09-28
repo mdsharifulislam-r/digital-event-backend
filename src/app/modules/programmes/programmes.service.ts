@@ -811,6 +811,38 @@ const getsAnalayticsForProgrammes = async (programmesId:string)=>{
 }
 
 
+const getProggramesAnalytics = async (user:JwtPayload)=>{
+  const totalProgrammes = await Programmes.countDocuments({owner:user.id})
+  const pusblishedProgrammes = await Programmes.countDocuments({status:'published',owner:user.id})
+  const totalBookingsAndEarnings = await Booking.aggregate([
+    {
+      $match: {
+        organization: new mongoose.Types.ObjectId(user.id),
+        payment_status: 'paid',
+        status: 'confirmed',
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        totalBookings: { $sum: 1 },
+        totalEarnings: { $sum: '$price' },
+      },
+    },
+  ])
+
+  const totalBookings = totalBookingsAndEarnings.length > 0 ? totalBookingsAndEarnings[0].totalBookings : 0;
+  const totalEarnings = totalBookingsAndEarnings.length > 0 ? totalBookingsAndEarnings[0].totalEarnings : 0;
+  
+  return {
+    totalProgrammes,
+    pusblishedProgrammes,
+    total_downloads: totalBookings,
+    totalEarnings
+  }
+}
+
+
 
 
 
@@ -832,5 +864,6 @@ export const ProgrammesServices = {
   changeChangeStatusOfUserThoughts,
   getToughtsOfProgrammes,
   getPollsInformationOfProgrammes,
-  getsAnalayticsForProgrammes
+  getsAnalayticsForProgrammes,
+  getProggramesAnalytics
 };

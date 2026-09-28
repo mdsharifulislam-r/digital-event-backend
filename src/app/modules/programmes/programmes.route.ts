@@ -49,7 +49,8 @@ router.route('/user-thoughts/:id')
     .get(auth(USER_ROLES.ORGANIZATION),ProgrammesController.getToughtsOfProgrammes)
     .patch(auth(USER_ROLES.ORGANIZATION),ProgrammesController.changeChangeStatusOfUserThoughts);
 
-
+router.route("/stats")
+    .get(auth(USER_ROLES.ORGANIZATION),ProgrammesController.getProggramesAnalyticsStats);
 
 router.route('/:id')
     .get(auth(),ProgrammesController.getProgrammesById)

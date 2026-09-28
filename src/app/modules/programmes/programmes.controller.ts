@@ -271,6 +271,19 @@ const getsAnalayticsForProgrammes = catchAsync(
   },
 )
 
+
+const getProggramesAnalyticsStats = catchAsync(
+  async (req: Request, res: Response, next: NextFunction) => {
+    const result = await ProgrammesServices.getProggramesAnalytics(req.user);
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: 'Programmes analytics retrieved successfully',
+      data: result,
+    });
+  },
+)
+
 export const ProgrammesController = {
   createProgrammes,
   getProgrammesById,
@@ -289,5 +302,6 @@ export const ProgrammesController = {
   getToughtsOfProgrammes,
   getPollsInformationOfProgrammes,
   getPollAnswersByPollId,
-  getsAnalayticsForProgrammes
+  getsAnalayticsForProgrammes,
+  getProggramesAnalyticsStats
 };
