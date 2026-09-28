@@ -15,3 +15,18 @@ export type IBooking = {
 };
 
 export type BookingModel = Model<IBooking>;
+
+
+
+export type IFreeDownLoad = {
+  programme: Types.ObjectId;
+  user: Types.ObjectId;
+  organization: Types.ObjectId;
+  status:"registered"|"paid",
+  booking:Types.ObjectId
+  month_id:string,
+  download_fee ?: number
+}
+
+
+export type FreeDownLoadModel = Model<IFreeDownLoad>;

@@ -31,7 +31,7 @@ const eventSchema = new Schema<IEvent, EventModel>({
   },
   price: { type: Number, default: 0 },
   event_date: { type: Date, required: true },
-  vanue: { type: Schema.Types.ObjectId, required: true, ref: 'Venue' },
+  vanue: { type: Schema.Types.ObjectId, required: false, ref: 'Venue' },
   programme: { type: Schema.Types.ObjectId, required: false, ref: 'Programmes' },
   social: {
     share_url: { type: String, required: true },

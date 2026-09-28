@@ -6,6 +6,8 @@ import {
   TRANSACTION_PAYMENT_TYPE,
   TRANSACTION_TYPE,
 } from '../../../enums/transaction';
+import { Subscription } from '../subscription/subscription.model';
+import { FreeDownLoad } from './booking.model';
 
 const createInitialTrxsection = async (bookingId: IBooking) => {
   try {
@@ -43,6 +45,30 @@ const createInitialTrxsection = async (bookingId: IBooking) => {
 };
 
 
+const createFreeDownload = async (booking: IBooking) => {
+  try {
+    const organizationSubscription = await Subscription.findOne({
+      user: booking.organization,
+      status: 'active',
+    }).lean()
+
+    if(organizationSubscription?.download_fee_price){
+      await FreeDownLoad.create({
+        programme: booking.programme,
+        user: booking.user,
+        organization: booking.organization,
+        booking: (booking as  any)._id,
+        download_fee: organizationSubscription.download_fee_price
+      })
+    }
+    
+  } catch (error) {
+    console.error('Error creating initial transaction:', error);
+  }
+}
+
+
 export const BookingHandler = {
   createInitialTrxsection,
+  createFreeDownload
 };

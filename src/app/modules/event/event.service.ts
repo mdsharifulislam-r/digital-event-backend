@@ -13,6 +13,7 @@ import { Follower, User } from '../user/user.model';
 import { sendActivity } from '../../../handlers/activityHelper';
 import { ACTIVITY_TYPE } from '../../../enums/activity';
 import config from '../../../config';
+import { kafkaProducer } from '../../../tools/kafka/kafka-producers/kafka.producer';
 
 const createEvent = async (data: Partial<IEvent>) => {
   const event = (await Event.create(data))
@@ -218,6 +219,10 @@ const purchaseProggramme = async (eventId: string, userId: string) => {
             payment_status: "paid",
             price: 0,
             organization: event.author,
+        })
+        await kafkaProducer.sendMessage("proggrames",{
+            type:"free-download-record",
+            data:newBooking
         })
         return { message: "Programme purchased successfully" };
     }

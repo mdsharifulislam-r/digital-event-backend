@@ -41,7 +41,7 @@ const getAllArtists = catchAsync(async (req: Request, res: Response, next: NextF
 
 const getArtistById = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const id = req.params.id;
-    const result = await ArtistServices.singleArtist(id);
+    const result = await ArtistServices.singleArtist(id, req.user);
     sendResponse(res, {
         success: true,
         statusCode: StatusCodes.OK,

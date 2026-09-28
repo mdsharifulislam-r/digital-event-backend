@@ -1,3 +1,4 @@
+import { BookingHandler } from "../../../app/modules/booking/booking.handler";
 import { ProgrammesServices } from "../../../app/modules/programmes/programmes.service"
 import { kafkaConsumer } from "../kafka-producers/kafka.consumer"
 
@@ -10,6 +11,9 @@ export const proggramesConsumer = async ()=>{
                     break;
                 case "answer-poll":
                     await ProgrammesServices.answerPoll(data.data);
+                    break;
+                case "free-download-record":
+                    await BookingHandler.createFreeDownload(data.data);
                     break;
             }
         } catch (error) {

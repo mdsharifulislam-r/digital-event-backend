@@ -31,9 +31,13 @@ const getAllArtists = async (query: Record<string, any>, user: JwtPayload) => {
 }
 
 
-const singleArtist = async (artistId: string) => {
-    const artist = await Artist.findById(artistId);
-    return artist;
+const singleArtist = async (artistId: string, user: JwtPayload) => {
+    const artist = await Artist.findById(artistId).lean();
+    const isFavorited = await Favorite.countDocuments({ item: artistId, type: "Artist", user: user?.id }).lean() > 0;
+    return {
+        ...artist,
+        isFavorited
+    };
 }
 
 

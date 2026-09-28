@@ -1,7 +1,10 @@
 import cron from 'node-cron'
+import { sendScheduleNotification } from './handlers/sendScheduleNotification';
+import { expiredSubscription } from './handlers/calculateMonthlyDownloadFee';
 
-const worker = () => {
-    cron.schedule('* * * * *', () => {
-        console.log('running a task every minute');
+export const worker = () => {
+    cron.schedule('*/10 * * * *', () => {
+        expiredSubscription()
+        sendScheduleNotification()
     });
 }

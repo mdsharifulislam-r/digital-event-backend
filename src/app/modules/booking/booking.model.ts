@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose';
-import { IBooking, BookingModel } from './booking.interface'; 
+import { IBooking, BookingModel, IFreeDownLoad, FreeDownLoadModel } from './booking.interface'; 
 import { BookingHandler } from './booking.handler';
 
 const bookingSchema = new Schema<IBooking, BookingModel>({
@@ -23,3 +23,23 @@ bookingSchema.pre('save', async function(next) {
 });
 
 export const Booking = model<IBooking, BookingModel>('Booking', bookingSchema);
+
+
+const freeDownLoadSchema = new Schema<IFreeDownLoad, FreeDownLoadModel>({
+  programme: { type: Schema.Types.ObjectId, ref: 'Programmes', required: true },
+  user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  organization: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  status: { type: String, enum: ['registered', 'paid'], default: 'registered' },
+  booking: { type: Schema.Types.ObjectId, ref: 'Booking', required: true },
+  month_id: { type: String, required: false },
+  download_fee: { type: Number, default: 0 },
+}, {
+  timestamps: true,
+});
+
+freeDownLoadSchema.pre('save', async function(next) {
+  this.month_id = new Date().toISOString().slice(0, 7);
+  next();
+});
+
+export const FreeDownLoad = model<IFreeDownLoad, FreeDownLoadModel>('FreeDownLoad', freeDownLoadSchema);

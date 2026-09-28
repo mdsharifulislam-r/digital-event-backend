@@ -44,6 +44,13 @@ export const sendNotificationsAdmin = async (
 };
 
 
+export const sendRealtimeNotification = async (data: INotification) => {
+  const socketIo = global.socketServer;
+  if (socketIo) {
+    socketIo.emit(`get-notification::${data?.receiver![0]}`, data);
+  }
+};
+
 
 
 export const sendNotificationQueue = async (data: INotification) => {
