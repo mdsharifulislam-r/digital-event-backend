@@ -13,7 +13,7 @@ const createVanue = async (payload: IVenue): Promise<IVenue> => {
         coordinates: [payload.coordinates?.longitude || 0, payload.coordinates?.latitude || 0]
     }
     const createdVanue = await Venue.create(payload);
-    sendActivity({ title: "New Vanue Added", description: `Created vanue ${createdVanue?.name}`, user: createdVanue?.owner, type: ACTIVITY_TYPE.VENUE })
+    sendActivity({ title: "New Venue Added", description: `Created venue ${createdVanue?.name}`, user: createdVanue?.owner, type: ACTIVITY_TYPE.VENUE })
     return createdVanue;
 }
 

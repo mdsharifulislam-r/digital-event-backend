@@ -49,19 +49,7 @@ const performanceSchema = z.object({
   // your fields
 });
 
-const hostSchema = z.object({
-    name: z.string(),
-    username: z.string().optional(),
-    avatar_url: z.string().url().optional(),
-    bio: z.string().optional(),
-});
 
-
-const artistSchema = z.object({
-  name: z.string(),
-  description: z.string(),
-  category: z.string(),
-})
 
 /* -------------------------------------------------------------------------- */
 /*                           FormData Compatible Schema                       */
@@ -117,7 +105,7 @@ export const createEventFormDataSchema = z.object({
   //   hostSchema
   // ),
 
-  vanue: objectIdSchema,
+  vanue: objectIdSchema.optional(),
 
   programme: objectIdSchema.optional(),
 
