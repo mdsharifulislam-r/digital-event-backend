@@ -70,29 +70,29 @@ const getProgrammesById = async (
   // }
   const programmes = await Programmes.findById(id);
 
-  if (
-    user.role == USER_ROLES.ORGANIZATION &&
-    programmes?.owner.toString() != user.id
-  ) {
-    throw new ApiError(
-      StatusCodes.UNAUTHORIZED,
-      'You are not authorized to access this resource.',
-    );
-  }
-  if (user.role == USER_ROLES.USER) {
-    const booking = await Booking.findOne({
-      programme: id,
-      user: user.id,
-      payment_status: 'paid',
-      status: 'confirmed',
-    });
-    if (!booking) {
-      throw new ApiError(
-        StatusCodes.UNAUTHORIZED,
-        'You are not authorized to access this resource.',
-      );
-    }
-  }
+  // if (
+  //   user.role == USER_ROLES.ORGANIZATION &&
+  //   programmes?.owner.toString() != user.id
+  // ) {
+  //   throw new ApiError(
+  //     StatusCodes.UNAUTHORIZED,
+  //     'You are not authorized to access this resource.',
+  //   );
+  // }
+  // if (user.role == USER_ROLES.USER) {
+  //   const booking = await Booking.findOne({
+  //     programme: id,
+  //     user: user.id,
+  //     payment_status: 'paid',
+  //     status: 'confirmed',
+  //   });
+  //   if (!booking) {
+  //     throw new ApiError(
+  //       StatusCodes.UNAUTHORIZED,
+  //       'You are not authorized to access this resource.',
+  //     );
+  //   }
+  // }
   if (programmes) {
     // await RedisHelper.redisSet(`programmes:${id}:${user.id}`, programmes);
   }
