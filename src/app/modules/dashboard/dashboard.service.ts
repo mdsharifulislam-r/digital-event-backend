@@ -1,5 +1,5 @@
 import { JwtPayload } from "jsonwebtoken";
-import { Booking } from "../booking/booking.model";
+import { Booking, FreeDownLoad } from "../booking/booking.model";
 import { Types } from "mongoose";
 import { Event } from "../event/event.model";
 import { Programmes } from "../programmes/programmes.model";
@@ -14,21 +14,26 @@ import { Venue } from "../vanue/vanue.model";
 
 
 const getOrganizationStatsData = async (user: JwtPayload)=> {
-    const [total_downloads,total_revenue,total_events] = await Promise.all([
+    const [total_downloads,total_revenue,total_events,total_dues] = await Promise.all([
         Booking.countDocuments({ organization: user.id }),
         Booking.aggregate([
             { $match: { organization:new Types.ObjectId(user.id) } },
             { $group: { _id: null, total: { $sum: "$price" } } }
         ]),
+        Event.countDocuments({ author: user.id }),
+        FreeDownLoad.aggregate([
+            { $match: { organization: new Types.ObjectId(user.id) } },
+            { $group: { _id: null, total: { $sum: "$download_fee" } } }
+        ])
 
-        Event.countDocuments({ author: user.id })
 
     ])
 
     return {
         total_downloads,
         total_revenue: total_revenue.length > 0 ? total_revenue[0].total : 0,
-        total_events
+        total_events,
+        total_dues: total_dues.length > 0 ? total_dues[0].total : 0
     }
 }
 
