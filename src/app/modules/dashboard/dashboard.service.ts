@@ -21,10 +21,7 @@ const getOrganizationStatsData = async (user: JwtPayload)=> {
             { $group: { _id: null, total: { $sum: "$price" } } }
         ]),
         Event.countDocuments({ author: user.id }),
-        FreeDownLoad.aggregate([
-            { $match: { organization: new Types.ObjectId(user.id) } },
-            { $group: { _id: null, total: { $sum: "$download_fee" } } }
-        ])
+        Venue.countDocuments({ owner: user.id })
 
 
     ])
@@ -33,7 +30,7 @@ const getOrganizationStatsData = async (user: JwtPayload)=> {
         total_downloads,
         total_revenue: total_revenue.length > 0 ? total_revenue[0].total : 0,
         total_events,
-        total_dues: total_dues.length > 0 ? total_dues[0].total : 0
+        total_venues: total_dues
     }
 }
 
