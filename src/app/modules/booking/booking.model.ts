@@ -29,7 +29,7 @@ const freeDownLoadSchema = new Schema<IFreeDownLoad, FreeDownLoadModel>({
   programme: { type: Schema.Types.ObjectId, ref: 'Programmes', required: true },
   user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   organization: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-  status: { type: String, enum: ['registered', 'paid'], default: 'registered' },
+  status: { type: String, enum: ['registered', 'paid', 'inProgress'], default: 'registered' },
   booking: { type: Schema.Types.ObjectId, ref: 'Booking', required: true },
   month_id: { type: String, required: false },
   download_fee: { type: Number, default: 0 },

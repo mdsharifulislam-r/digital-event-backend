@@ -22,7 +22,7 @@ export type IFreeDownLoad = {
   programme: Types.ObjectId;
   user: Types.ObjectId;
   organization: Types.ObjectId;
-  status:"registered"|"paid",
+  status:"registered"|"paid"|"inProgress"
   booking:Types.ObjectId
   month_id:string,
   download_fee ?: number

@@ -1,6 +1,8 @@
 import { FreeDownLoad } from "../../app/modules/booking/booking.model";
 import { Subscription } from "../../app/modules/subscription/subscription.model";
+import { Organization, User } from "../../app/modules/user/user.model";
 import config from "../../config";
+import stripe from "../../config/stripe";
 import { emailHelper } from "../../helpers/emailHelper";
 import { emailTemplate } from "../../shared/emailTemplate";
 
@@ -18,10 +20,28 @@ const calculateMontlyDownloadFee = async () => {
         },
         {
             $group:{
-                
+                _id:"$organization",
+                total:{$sum:1},
+                price:{$sum:"$download_fee"}
             }
         }
     ])
+
+    await Promise.all(prices.map(async (price:any) => {
+        try {
+            const organization = await User.findById(price._id).lean();
+            if(!organization?.stripe_account_id){
+                throw new Error(`Organization ${price._id} does not have a stripe account id`);
+
+            }
+
+            
+
+            
+        }catch (error) {
+            console.error(`Error calculating monthly download fee for organization ${price._id}:`, error);
+        }
+    }))
 };
 
 
