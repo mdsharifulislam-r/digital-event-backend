@@ -149,7 +149,7 @@ const getAllProgrammes = async (
     initQuery = {};
   }
   const programmesQuery = new QueryBuilder<IProgrammes>(
-    Programmes.find(initQuery,{title:1,category:1,status:1,createdAt:1,updatedAt:1,is_free:1,price_pence:1,cover_image:1}),
+    Programmes.find(initQuery,{title:1,category:1,status:1,createdAt:1,updatedAt:1,is_free:1,price_pence:1,cover_image:1,event_id:1}),
     query,
   )
     .search(['title'])
