@@ -158,7 +158,7 @@ const getAllProgrammes = async (
     .paginate()
 
   const [programmes, paginationInfo] = await Promise.all([
-    programmesQuery.modelQuery.exec(),
+    programmesQuery.modelQuery.populate('event_id','qr_code_url').exec(),
     programmesQuery.getPaginationInfo(),
   ]);
   await RedisHelper.redisSet(
