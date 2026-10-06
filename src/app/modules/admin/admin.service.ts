@@ -32,7 +32,7 @@ const deleteAdminFromDB = async (id: any): Promise<IUser | undefined> => {
 };
 
 const getAdminFromDB = async (query:Record<string,any>)=> {
-    const result = new QueryBuilder(User.find({verified:true,isDeleted:false,role:{$in:[USER_ROLES.ADMIN,USER_ROLES.SUPER_ADMIN]}}),query).paginate().sort()
+    const result = new QueryBuilder(User.find({verified:true,status:'active',role:{$in:[USER_ROLES.ADMIN,USER_ROLES.SUPER_ADMIN]}}),query).paginate().sort()
     const paginationInfo = await result.getPaginationInfo()
     const resultData = await result.modelQuery.lean()
     return {

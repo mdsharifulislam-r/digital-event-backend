@@ -32,6 +32,8 @@ export const createPackageZodSchema = z.object({
     })
     .min(1, 'At least one module is required'),
 
+  status:z.enum(['active','hide'],{message:'Status must be either active or hide'}).optional(),
+
   can_charge: z.boolean({
     required_error: 'Can charge field is required',
     invalid_type_error: 'Can charge must be a boolean',
@@ -100,6 +102,8 @@ const updatePackageZodSchema = z.object({
     })
     .min(1, 'Short name cannot be empty')
     .optional(),
+
+  status:z.enum(['active','hide'],{message:'Status must be either active or hide'}).optional(),
 
   audience: z
     .string({
