@@ -634,7 +634,7 @@ const getWeekDaysDwellTime = async (user: JwtPayload, query: IProgrammesAnalytic
     dateData.forEach((item) => {
       const dateKey = new Date(item.date).toISOString().split('T')[0];
       if (allDates[dateKey]) {
-        allDates[dateKey].dwellTime = item.dwellTime;
+        allDates[dateKey].dwellTime = item.dwellTime/(60*60);
       }
     });
 
