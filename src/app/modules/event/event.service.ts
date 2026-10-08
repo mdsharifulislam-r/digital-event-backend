@@ -17,6 +17,9 @@ import { kafkaProducer } from '../../../tools/kafka/kafka-producers/kafka.produc
 
 const createEvent = async (data: Partial<IEvent>) => {
   const event = (await Event.create(data))
+  if(data.programme){
+    await Programmes.findByIdAndUpdate(data.programme, { event_id: event._id });
+  }
   await RedisHelper.keyDelete(`events_all:${data.author}:*`);
   await RedisHelper.keyDelete(`event:${event._id}:*`);
   sendActivity({title:"New Event Created",description:`Created event ${event?.title}`,user:data.author,type:ACTIVITY_TYPE.EVENT})
@@ -89,6 +92,9 @@ const updateEvent = async (id: string, data: Partial<IEvent>) => {
   const isExist = await Event.findById(id);
   if (!isExist) {
     throw new ApiError(StatusCodes.NOT_FOUND, 'Event not found');
+  }
+  if(data.programme){
+    await Programmes.findByIdAndUpdate(data.programme, { event_id: id });
   }
   const updatedEvent = await Event.findByIdAndUpdate(id, data, { new: true });
   if (updatedEvent) {

@@ -43,8 +43,35 @@ const getAdmin = catchAsync(async (req: Request, res: Response) => {
 
 });
 
+
+const updateAdmin = catchAsync(async (req: Request, res: Response) => {
+    const payload = req.body;
+    const id = req.params.id;
+    const result = await AdminService.updateAdminToDB(id, payload);
+    sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: 'Admin Updated Successfully',
+        data: result
+    });
+});
+
+
+const getAdminById = catchAsync(async (req: Request, res: Response) => {
+    const id = req.params.id;
+    const result = await AdminService.getAdminByIdFromDB(id);
+    sendResponse(res, {
+        statusCode: StatusCodes.OK,
+        success: true,
+        message: 'Admin Retrieved Successfully',
+        data: result
+    });
+});
+
 export const AdminController = {
     deleteAdmin,
     createAdmin,
-    getAdmin
+    getAdmin,
+    updateAdmin,
+    getAdminById
 };

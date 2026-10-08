@@ -23,7 +23,17 @@ router.delete(
     '/:id',
     auth(USER_ROLES.SUPER_ADMIN),
     AdminController.deleteAdmin
-);
+)
+router.patch(
+    '/:id',
+    auth(USER_ROLES.SUPER_ADMIN),
+    AdminController.updateAdmin
+)
+router.get(
+    '/:id',
+    auth(),
+    AdminController.getAdminById
+)
 
 
 
