@@ -567,7 +567,8 @@ const getWeekDaysDwellTime = async (user: JwtPayload, query: IProgrammesAnalytic
       dwellTimeGraphData.push({
         month: i,
         label: monthNames[i - 1],
-        dwellTime: Number((foundMonth?.dwellTime || 0)/60/60).toFixed(2),
+        // convert time from seconds to hours and round to 2 decimal places
+        dwellTime: Number((foundMonth?.dwellTime || 0)/(60*60)).toFixed(2),
       });
     }
   } else {
