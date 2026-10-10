@@ -30,7 +30,7 @@ const eventSchema = new Schema<IEvent, EventModel>({
     is_verified: { type: Boolean, default: false }
   },
   price: { type: Number, default: 0 },
-  event_date: { type: Date, required: true },
+  event_date: { type: Date, required: false },
   vanue: { type: Schema.Types.ObjectId, required: false, ref: 'Venue' },
   programme: { type: Schema.Types.ObjectId, required: false, ref: 'Programmes' },
   social: {

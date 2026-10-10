@@ -90,7 +90,7 @@ export const createEventFormDataSchema = z.object({
     z.array(z.string()).default([])
   ),
 
-  event_date: z.coerce.date({ required_error: 'Event date is required' }),
+  event_date: z.coerce.date({ required_error: 'Event date is required' }).optional(),
 
 
   get_tickets_url: z.string().url().optional(),
