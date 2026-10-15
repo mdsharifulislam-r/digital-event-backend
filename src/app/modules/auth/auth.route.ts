@@ -40,7 +40,7 @@ router.post(
 
 router.post(
   '/save-face-verification',
-  auth(USER_ROLES.USER),
+  auth(),
   fileUploadHandler(),
   validateRequest(AuthValidation.saveFaceDiscriminatorZodSchema),
   AuthController.saveFaceDiscriminatorToDB
