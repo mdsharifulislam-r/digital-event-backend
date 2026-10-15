@@ -53,4 +53,10 @@ router.post(
   AuthController.faceLogin
 );
 
+router.post(
+  '/social-login',
+  validateRequest(AuthValidation.socialSignInZodSchema),
+  AuthController.socialSignIn
+);
+
 export const AuthRoutes = router;

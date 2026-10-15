@@ -39,4 +39,5 @@ router.route('/upload-file').post(fileUploadHandler(), UserController.uploadFile
 
 router.delete('/delete-account', auth(),validateRequest(UserValidation.deleteAccountZodSchema) ,UserController.deleteAccount);
 router.post('/create-connected-account', auth(), UserController.createConnectedAccount);
+router.post('/accept-card', auth(), UserController.acceptBankInformation);
 export const UserRoutes = router;

@@ -47,11 +47,23 @@ const saveFaceDiscriminatorZodSchema = z.object({
   }),
 });
 
+
+const socialSignInZodSchema = z.object({
+  body: z.object({
+    email: z.string({ required_error: 'Email is required' }),
+    name: z.string({ required_error: 'Name is required' }),
+    picture: z.string({ required_error: 'Picture is required' }),
+    appId: z.string({ required_error: 'App ID is required' }),
+    social_type:z.enum(["Facebook", "Google"], { required_error: 'Social type is required' }),
+  }),
+})
+
 export const AuthValidation = {
   createVerifyEmailZodSchema,
   createForgetPasswordZodSchema,
   createLoginZodSchema,
   createResetPasswordZodSchema,
   createChangePasswordZodSchema,
-  saveFaceDiscriminatorZodSchema
+  saveFaceDiscriminatorZodSchema,
+  socialSignInZodSchema
 };

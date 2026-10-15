@@ -94,6 +94,18 @@ const faceLogin = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+
+const socialSignIn = catchAsync(async (req: Request, res: Response) => {
+  const { ...socialData } = req.body;
+  const result = await AuthService.socialSignIn(socialData);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'User logged in successfully.',
+    data: result,
+  });
+});
+
 export const AuthController = {
   verifyEmail,
   loginUser,
@@ -101,5 +113,6 @@ export const AuthController = {
   resetPassword,
   changePassword,
   saveFaceDiscriminatorToDB,
-  faceLogin
+  faceLogin,
+  socialSignIn
 };

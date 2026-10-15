@@ -4,7 +4,7 @@ import { model, Schema, SchemaType, Types } from 'mongoose';
 import config from '../../../config';
 import { ORGANIZATION_TYPE, USECASE_PLATFORM, USER_ROLES } from '../../../enums/user';
 import ApiError from '../../../errors/ApiError';
-import { FaceVerificationModal, FollowerModal, IFaceVerification, IFollower, IOrganization, ITempHoldWallet, IUser, OrganizationModal, TempHoldWalletModal, UserModal } from './user.interface';
+import { FaceVerificationModal, FollowerModal, IFaceVerification, IFollower, IOrganisationBilling, IOrganization, ITempHoldWallet, IUser, OrganisationBillingModal, OrganizationModal, TempHoldWalletModal, UserModal } from './user.interface';
 
 const userSchema = new Schema<IUser, UserModal>(
   {
@@ -103,6 +103,19 @@ const userSchema = new Schema<IUser, UserModal>(
     permissions: {
       type: [String],
       default: [],
+    },
+    appId: {
+      type: String,
+      default: null,
+    },
+    isSocial: {
+      type: Boolean,
+      default: false,
+    },
+    social_type: {
+      type: String,
+      enum: ['Google', 'Facebook'],
+      default: null,
     },
   },
   { timestamps: true,discriminatorKey: 'role' }
@@ -263,3 +276,55 @@ tempHoldWalletSchema.statics.createTempHoldWallet = async (userId: Types.ObjectI
   return await TempHoldWallet.create({ userId, amount }, { session });
 }
 export const TempHoldWallet = model<ITempHoldWallet, TempHoldWalletModal>('TempHoldWallet', tempHoldWalletSchema);
+
+
+
+
+const organisationBillingSchema = new Schema<IOrganisationBilling, OrganisationBillingModal>(
+  {
+    organisationId: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      unique: true,
+      index: true,
+    },
+    stripeCustomerId: {
+      type: String,
+      unique: true,
+      sparse: true,
+    },
+    defaultPaymentMethodId: {
+      type: String,
+      default: null,
+    },
+    cardStatus: {
+      type: String,
+      enum: ["missing", "pending", "ready", "failed"],
+      default: "missing",
+    },
+    consent: {
+      accepted: { type: Boolean, default: false },
+      termsVersion: String,
+      acceptedAt: Date,
+      actorUserId: Schema.Types.ObjectId,
+      consentText: String,
+    },
+    outstandingBalancePence: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    billingEnabled: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  { timestamps: true }
+);
+
+organisationBillingSchema.index({ organisationId: 1 });
+
+export const OrganisationBilling = model(
+  "OrganisationBilling",
+  organisationBillingSchema
+);

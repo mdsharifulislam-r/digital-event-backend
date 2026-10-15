@@ -122,6 +122,19 @@ const createConnectedAccount = catchAsync(
   },
 );
 
+const acceptBankInformation = catchAsync(
+  async (req: Request, res: Response) => {
+    const user = req.user;
+    const result = await UserService.createCardSetupIntent(user.id);
+    sendResponse(res, {
+      success: true,
+      statusCode: StatusCodes.OK,
+      message: 'Bank information accepted successfully',
+      data: result,
+    });
+  },
+);
+
 export const UserController = {
   createUser,
   getUserProfile,
@@ -132,4 +145,5 @@ export const UserController = {
   getAllUsers,
   deleteAccount,
   createConnectedAccount,
+  acceptBankInformation
 };

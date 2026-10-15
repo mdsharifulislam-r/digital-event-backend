@@ -7,7 +7,7 @@ import { emailTemplate } from '../../../shared/emailTemplate';
 import unlinkFile from '../../../shared/unlinkFile';
 import generateOTP from '../../../util/generateOTP';
 import { ISuspendPayload, IUser } from './user.interface';
-import { Follower, Organization, User } from './user.model';
+import { Follower, OrganisationBilling, Organization, User } from './user.model';
 import { AuthHelper } from '../auth/auth.helper';
 import { Types } from 'mongoose';
 import { RedisHelper } from '../../../tools/redis/redis.helper';
@@ -249,6 +249,83 @@ const createConnectedAccount = async (user: JwtPayload) => {
 };
 
 
+export async function ensureStripeCustomer(organisationId: string) {
+ try {
+   const orgnazation = await User.findOne({ _id: organisationId }).lean()
+  if (!orgnazation) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "Organisation doesn't exist!");
+  }
+  let billing = await OrganisationBilling.findOne({
+    organisationId: organisationId,
+  });
+
+  if (billing?.stripeCustomerId) {
+    return billing;
+  }
+
+  if (!billing) {
+    billing = await OrganisationBilling.create({
+      organisationId: organisationId,
+    });
+  }
+
+  // Use a deterministic idempotency key for retries.
+  const customer = await stripe.customers.create(
+    {
+      name: orgnazation.name,
+      email: orgnazation.email,
+      metadata: {
+        organisationId: organisationId,
+      },
+    },
+    {
+      idempotencyKey:
+        `showe-customer-${organisationId}-${organisationId}`,
+    }
+  );
+
+  billing.stripeCustomerId = customer.id;
+  await billing.save();
+
+  return billing;
+ } catch (error) {
+  console.log(error);
+ }
+}
+
+export async function createCardSetupIntent(
+  organisationId: string
+) {
+  let billing = await OrganisationBilling.findOne({
+    organisationId,
+  });
+
+  if (!billing?.stripeCustomerId) {
+    billing = await ensureStripeCustomer(organisationId) as any;
+  }
+
+  const setupIntent = await stripe.setupIntents.create(
+    {
+      customer: billing?.stripeCustomerId,
+      payment_method_types: ["card"],
+      usage: "off_session",
+      metadata: {
+        organisationId,
+      },
+    },
+    {
+      idempotencyKey:
+        `showe-setup-${organisationId}-${crypto.randomUUID()}`,
+    }
+  );
+
+  return {
+    clientSecret: setupIntent.client_secret,
+  };
+}
+
+
+
 
 export const UserService = {
   createUserToDB,
@@ -259,4 +336,6 @@ export const UserService = {
   getAllUsers,
   deleteUserAccount,
   createConnectedAccount,
+  ensureStripeCustomer,
+  createCardSetupIntent
 };

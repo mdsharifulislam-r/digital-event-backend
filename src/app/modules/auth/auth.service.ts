@@ -20,11 +20,14 @@ import { AuthHelper } from './auth.helper';
 import { detectFace, verifyFace } from '../../../helpers/faceVerificationHelper';
 import { sendActivity } from '../../../handlers/activityHelper';
 import { ACTIVITY_TYPE } from '../../../enums/activity';
+import { UserService } from '../user/user.service';
+import { ISocialSignIn } from './auth.interface';
+import { USER_ROLES } from '../../../enums/user';
 
 //login
 const loginUserFromDB = async (payload: ILoginData) => {
   const { email, password } = payload;
-  const isExistUser = await User.findOne({ email }).select('+password');
+  const isExistUser = await User.findOne({ email,isSocial: { $ne: true } }).select('+password');
   if (!isExistUser) {
     throw new ApiError(StatusCodes.BAD_REQUEST, `User doesn't exist!`);
   }
@@ -134,6 +137,7 @@ const verifyEmailToDB = async (payload: IVerifyEmail) => {
       config.jwt.jwt_expire_in as string
     )
     message = 'Email verify successfully';
+    UserService.ensureStripeCustomer(isExistUser._id?.toString());
     data = { accessToken, role: isExistUser.role };
   } else {
     await User.findOneAndUpdate(
@@ -316,6 +320,48 @@ const faceLoginToDB = async (face_image: string, device_id: string) => {
     return { accessToken: createToken, role: user.role };
 }
 
+
+const socialSignIn = async (payload: ISocialSignIn) => {
+  const isExistUser = await User.findOne({ email: payload.email,appId: payload.appId,isSocial: true });
+
+  if(isExistUser){
+    if(isExistUser.status === 'delete'){
+      throw new ApiError(
+        StatusCodes.BAD_REQUEST,
+        'You don’t have permission to access this content. It looks like your account has been deactivated.'
+      );
+    }
+    if(isExistUser.social_type !== payload.social_type){
+      throw new ApiError(StatusCodes.BAD_REQUEST, 'User already exists with different social type');
+    }
+    const createToken = jwtHelper.createToken(
+      { id: isExistUser._id, role: isExistUser.role, email: isExistUser.email },
+      config.jwt.jwt_secret as Secret,
+      config.jwt.jwt_expire_in as string
+    );
+    return { accessToken: createToken, role: isExistUser.role };
+  }
+
+  const createUser = await User.create({
+    name: payload.name,
+    email: payload.email,
+    social_type: payload.social_type,
+    image: payload.picture,
+    appId: payload.appId,
+    isSocial: true,
+    verified: true,
+    password:"SocialSingnIn",
+    status:"active",
+    role:USER_ROLES.USER,
+  });
+  const createToken = jwtHelper.createToken(
+    { id: createUser._id, role: createUser.role, email: createUser.email },
+    config.jwt.jwt_secret as Secret,
+    config.jwt.jwt_expire_in as string
+  );
+  return { accessToken: createToken, role: createUser.role };
+}
+
 export const AuthService = {
   verifyEmailToDB,
   loginUserFromDB,
@@ -323,5 +369,6 @@ export const AuthService = {
   resetPasswordToDB,
   changePasswordToDB,
   saveFaceDiscriminatorToDB,
-  faceLoginToDB
+  faceLoginToDB,
+  socialSignIn
 };

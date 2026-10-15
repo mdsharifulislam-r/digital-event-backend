@@ -7,6 +7,9 @@ export type IUser = {
   contact: string;
   email: string;
   password: string;
+  appId: string;
+  isSocial: boolean;
+  social_type:"Google" | "Facebook"
   location: string;
   image?: string;
   status: 'active' | 'delete';
@@ -84,3 +87,30 @@ export type ITempHoldWallet = {
 export type TempHoldWalletModal = {
   createTempHoldWallet(userId: Types.ObjectId, amount: number,session?:any): Promise<ITempHoldWallet>;
 } & Model<ITempHoldWallet>;
+
+
+export interface IOrganisationBilling {
+  organisationId: Types.ObjectId;
+  stripeCustomerId?: string;
+  defaultPaymentMethodId: string | null;
+
+  cardStatus: "missing" | "pending" | "ready" | "failed";
+
+  consent: {
+    accepted: boolean;
+    termsVersion?: string;
+    acceptedAt?: Date;
+    actorUserId?: Types.ObjectId;
+    consentText?: string;
+  };
+
+  outstandingBalancePence: number;
+  billingEnabled: boolean;
+
+  createdAt?: Date;
+  updatedAt?: Date;
+}
+
+
+export type OrganisationBillingModal = {
+} & Model<IOrganisationBilling>;
