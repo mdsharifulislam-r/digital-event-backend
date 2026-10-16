@@ -28,7 +28,18 @@ const deleteMyProgrammes = catchAsync(async (req: Request, res: Response, next: 
 });
 
 
+const getBookingInformationAddressWise = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const result = await BookingServices.getBookingInformationAddressWise();
+    sendResponse(res, {
+        success: true,
+        statusCode: StatusCodes.OK,
+        message: 'Programmes retrieved successfully',
+        data: result
+    });
+})
+
 export const BookingController = {
     getMyAllProgrammes,
-    deleteMyProgrammes
+    deleteMyProgrammes,
+    getBookingInformationAddressWise
 };

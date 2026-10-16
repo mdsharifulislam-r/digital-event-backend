@@ -8,6 +8,8 @@ const router = express.Router();
 router.route("/")
     .get(auth(),BookingController.getMyAllProgrammes);
 
+router.get("/address-wise-info",auth(USER_ROLES.ADMIN,USER_ROLES.SUPER_ADMIN),BookingController.getBookingInformationAddressWise)
+
 router.route("/:id")
     .delete(auth(USER_ROLES.USER),BookingController.deleteMyProgrammes);
 
