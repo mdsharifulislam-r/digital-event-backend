@@ -114,8 +114,12 @@ const userSchema = new Schema<IUser, UserModal>(
     },
     social_type: {
       type: String,
-      enum: ['Google', 'Facebook'],
+      enum: ['Google', 'Facebook', 'Apple'],
       default: null,
+    },
+    fcmTokens: {
+      type: [String],
+      default: [],
     },
   },
   { timestamps: true,discriminatorKey: 'role' }

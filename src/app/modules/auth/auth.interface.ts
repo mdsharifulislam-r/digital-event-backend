@@ -3,5 +3,5 @@ export type ISocialSignIn = {
     name: string;
     picture: string;
     appId: string;
-    social_type: "Google" | "Facebook";
+    social_type: "Google" | "Facebook"|'Apple';
 };

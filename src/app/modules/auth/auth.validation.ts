@@ -11,6 +11,7 @@ const createLoginZodSchema = z.object({
   body: z.object({
     email: z.string({ required_error: 'Email is required' }),
     password: z.string({ required_error: 'Password is required' }),
+    fcmToken: z.string().optional(),
   }),
 });
 
@@ -54,7 +55,7 @@ const socialSignInZodSchema = z.object({
     name: z.string({ required_error: 'Name is required' }),
     picture: z.string({ required_error: 'Picture is required' }),
     appId: z.string({ required_error: 'App ID is required' }),
-    social_type:z.enum(["Facebook", "Google"], { required_error: 'Social type is required' }),
+    social_type:z.enum(["Facebook", "Google", "Apple"], { required_error: 'Social type is required' }),
   }),
 })
 

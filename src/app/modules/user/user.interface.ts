@@ -22,6 +22,7 @@ export type IUser = {
   stripe_login_link?: string;
   suspendedUntil?: Date;
   subscription:Types.ObjectId;
+  fcmTokens?: string[];
   permissions: string[];
   authentication?: {
     isResetPassword: boolean;
