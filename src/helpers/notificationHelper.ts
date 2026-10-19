@@ -21,11 +21,13 @@ export const sendNotifications = async (
     socketIo.emit(`get-notification::${data?.receiver![0]}`, result[0]);
   }
 
-  sendNotificationToFCM({
+for(let i = 0; i < data.receiver!.length; i++){
+  await sendNotificationToFCM({
     title: data.title,
     body: data.message,
     data: data,
-  }, data.receiver![0]);
+  }, data.receiver![i]);
+}
 
   return result[0];
 };
