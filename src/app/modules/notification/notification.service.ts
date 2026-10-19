@@ -85,7 +85,7 @@ const sendPushNotification = async (
       payload,
       user.id,
     );
-    await sendNotifications({
+     sendNotifications({
       title: payload.title,
       message: payload.message,
       receiver: users,
