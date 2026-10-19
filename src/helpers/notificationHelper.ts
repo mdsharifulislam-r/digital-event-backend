@@ -4,6 +4,7 @@ import { Notification } from "../app/modules/notification/notification.model";
 import { User } from "../app/modules/user/user.model";
 import { USER_ROLES } from "../enums/user";
 import { kafkaProducer } from "../tools/kafka/kafka-producers/kafka.producer";
+import { sendNotificationToFCM } from "./sendNotificationFCM";
 
 export const sendNotifications = async (
   data: INotification,
@@ -19,6 +20,12 @@ export const sendNotifications = async (
   if (socketIo) {
     socketIo.emit(`get-notification::${data?.receiver![0]}`, result[0]);
   }
+
+  sendNotificationToFCM({
+    title: data.title,
+    body: data.message,
+    data: data,
+  }, data.receiver![0]);
 
   return result[0];
 };
