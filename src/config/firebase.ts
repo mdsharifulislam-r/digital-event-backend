@@ -7,7 +7,7 @@ import {
   initializeApp,
 } from "firebase-admin/app";
 import type { ServiceAccount } from "firebase-admin/app";
-import serviceAccount from "../../firbase.config.json"
+import serviceAccount from "../../firebase.config.json"
 
 dotenv.config({ path: path.join(process.cwd(), ".env") });
 
