@@ -4,4 +4,5 @@ export type ISocialSignIn = {
     picture: string;
     appId: string;
     social_type: "Google" | "Facebook"|'Apple';
+    fcmToken ?: string
 };
