@@ -4,6 +4,7 @@ import QueryBuilder from '../../builder/QueryBuilder';
 import { Programmes } from '../programmes/programmes.model';
 import ApiError from '../../../errors/ApiError';
 import { StatusCodes } from 'http-status-codes';
+import { Subscription } from '../subscription/subscription.model';
 const getMyAllProgrammes = async (
   user: JwtPayload,
   query: Record<string, any>,
@@ -87,10 +88,56 @@ const getBookingInformationAddressWise = async () => {
   return bookingInformation;
 };
 
+
+const getWebsiteRavinueInformationAndPercentage = async () => {
+  const totalRavenue = await Booking.aggregate([
+    {
+      $match: {
+        payment_status: 'paid',
+        status: 'confirmed',
+        isDeleted: { $ne: true },
+      },
+    },
+    {
+      $group: {
+        _id: null,
+        totalRavenue: { $sum: '$price' },
+      },
+    },
+  ])
+
+  const totalSubscriptionRavinue = await Subscription .aggregate([
+    {
+      $group: {
+        _id: null,
+        totalRavenue: { $sum: '$price' },
+      },
+    },
+  ])
+
+  const totalRavenueAmount = totalRavenue.length > 0 ? totalRavenue[0].totalRavenue : 0;
+  const totalSubscriptionRavenueAmount = totalSubscriptionRavinue.length > 0 ? totalSubscriptionRavinue[0].totalRavenue : 0;
+  
+  const totalPrice = totalRavenueAmount + totalSubscriptionRavenueAmount;
+  const subscriptionPercentange = (totalSubscriptionRavenueAmount / totalPrice) * 100;
+  const ravenuePercentange = (totalRavenueAmount / totalPrice) * 100;
+  return {
+    total : totalPrice,
+    subscription:{
+      percentange:subscriptionPercentange,
+      amount:totalSubscriptionRavenueAmount
+    },
+    booking:{
+      percentange:ravenuePercentange,
+      amount:totalRavenueAmount
+    }
+  }
+}
   
 
 export const BookingServices = {
   getMyAllProgrammes,
   deleteMyProgrammes,
-  getBookingInformationAddressWise
+  getBookingInformationAddressWise,
+  getWebsiteRavinueInformationAndPercentage
 };

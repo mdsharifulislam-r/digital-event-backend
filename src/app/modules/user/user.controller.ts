@@ -135,6 +135,17 @@ const acceptBankInformation = catchAsync(
   },
 );
 
+const deleteAccountBYId = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id;
+  const result = await UserService.deleteAccountBYId(id);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'Account deleted successfully',
+    data: result,
+  });
+});
+
 export const UserController = {
   createUser,
   getUserProfile,
@@ -145,5 +156,6 @@ export const UserController = {
   getAllUsers,
   deleteAccount,
   createConnectedAccount,
-  acceptBankInformation
+  acceptBankInformation,
+  deleteAccountBYId
 };

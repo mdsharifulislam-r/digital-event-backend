@@ -38,8 +38,20 @@ const getBookingInformationAddressWise = catchAsync(async (req: Request, res: Re
     });
 })
 
+
+const totalRavinuePercentance = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const result = await BookingServices.getWebsiteRavinueInformationAndPercentage();
+    sendResponse(res, {
+        success: true,
+        statusCode: StatusCodes.OK,
+        message: 'Programmes retrieved successfully',
+        data: result
+    });
+})
+
 export const BookingController = {
     getMyAllProgrammes,
     deleteMyProgrammes,
-    getBookingInformationAddressWise
+    getBookingInformationAddressWise,
+    totalRavinuePercentance
 };

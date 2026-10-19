@@ -325,6 +325,12 @@ export async function createCardSetupIntent(
 }
 
 
+const deleteAccountBYId = async (userId: string) => {
+  await User.findByIdAndUpdate(userId, { status: 'delete' }, { new: true });
+  return;
+};
+
+
 
 
 export const UserService = {
@@ -337,5 +343,6 @@ export const UserService = {
   deleteUserAccount,
   createConnectedAccount,
   ensureStripeCustomer,
-  createCardSetupIntent
+  createCardSetupIntent,
+  deleteAccountBYId
 };

@@ -10,6 +10,8 @@ router.route("/")
 
 router.get("/address-wise-info",auth(USER_ROLES.ADMIN,USER_ROLES.SUPER_ADMIN),BookingController.getBookingInformationAddressWise)
 
+router.get("/ravninue-percentage",auth(USER_ROLES.ADMIN,USER_ROLES.SUPER_ADMIN),BookingController.totalRavinuePercentance)
+
 router.route("/:id")
     .delete(auth(USER_ROLES.USER),BookingController.deleteMyProgrammes);
 
