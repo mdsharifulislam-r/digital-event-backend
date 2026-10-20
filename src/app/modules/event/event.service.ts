@@ -96,7 +96,17 @@ const updateEvent = async (id: string, data: Partial<IEvent>) => {
   if(data.programme){
     await Programmes.findByIdAndUpdate(data.programme, { event_id: id });
   }
-  console.log(data);
+
+  if(!data.vanue){
+    (data as any).vanue = null
+  }
+
+  if(!data.artist){
+    (data as any).artist = null
+  }
+  if(!data.programme){
+    (data as any).programme = null
+  }
   const updatedEvent = await Event.findByIdAndUpdate(id, data, { new: true });
   if (updatedEvent) {
     await RedisHelper.keyDelete(`events_all:${updatedEvent.author}:*`);
