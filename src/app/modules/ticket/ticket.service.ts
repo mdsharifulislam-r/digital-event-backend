@@ -38,7 +38,7 @@ const getAllTickets = async (query: Record<string, any>, user?: JwtPayload) => {
 	const cache = await RedisHelper.redisGet(cacheKey, query);
 	if (cache) return cache;
 
-	const ticketQuery = new QueryBuilder(Ticket.find(), query)
+	const ticketQuery = new QueryBuilder(Ticket.find({user:user?.id}), query)
 		.search(['name'])
 		.filter()
 		.sort()

@@ -11,6 +11,7 @@ const createTicket = catchAsync(async (req: Request, res: Response, next: NextFu
     if(file){
         payload.file = file
     }
+	payload.user = req.user.id
 	const result = await TicketServices.createTicket(payload);
 	sendResponse(res, {
 		success: true,
