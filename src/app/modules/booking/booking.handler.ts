@@ -61,6 +61,10 @@ const createFreeDownload = async (booking: IBooking) => {
         download_fee: organizationSubscription.download_fee_price
       })
     }
+
+    await Event.findByIdAndUpdate(booking.event, {
+      $inc: { downloads_count: 1 },
+    });
     
   } catch (error) {
     console.error('Error creating initial transaction:', error);
