@@ -370,6 +370,9 @@ const socialSignIn = async (payload: ISocialSignIn) => {
     config.jwt.jwt_secret as Secret,
     config.jwt.jwt_expire_in as string
   );
+  if(payload.fcmToken){
+    await User.findOneAndUpdate({ _id: createUser._id }, { $addToSet: { fcmTokens: payload.fcmToken } });
+  }
   return { accessToken: createToken, role: createUser.role };
 }
 
