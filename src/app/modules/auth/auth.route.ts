@@ -59,4 +59,10 @@ router.post(
   AuthController.socialSignIn
 );
 
+router.post(
+  '/logout',
+  auth(),
+  AuthController.logoutUser
+);
+
 export const AuthRoutes = router;

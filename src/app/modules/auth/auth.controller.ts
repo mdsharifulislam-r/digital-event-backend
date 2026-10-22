@@ -107,6 +107,17 @@ const socialSignIn = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+
+const logoutUser = catchAsync(async (req: Request, res: Response) => {
+  const user = req.user;
+  await AuthService.logoutUserFromDB(user);
+  sendResponse(res, {
+    success: true,
+    statusCode: StatusCodes.OK,
+    message: 'User logged out successfully.',
+  });
+})
+
 export const AuthController = {
   verifyEmail,
   loginUser,
@@ -115,5 +126,6 @@ export const AuthController = {
   changePassword,
   saveFaceDiscriminatorToDB,
   faceLogin,
-  socialSignIn
+  socialSignIn,
+  logoutUser
 };

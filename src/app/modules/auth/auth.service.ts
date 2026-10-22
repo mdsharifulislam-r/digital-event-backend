@@ -67,7 +67,7 @@ const loginUserFromDB = async (payload: ILoginData) => {
 
   //create token
   const createToken = jwtHelper.createToken(
-    { id: isExistUser._id, role: isExistUser.role, email: isExistUser.email },
+    { id: isExistUser._id, role: isExistUser.role, email: isExistUser.email,fcmToken:payload?.fcmToken },
     config.jwt.jwt_secret as Secret,
     config.jwt.jwt_expire_in as string
   );
@@ -330,7 +330,7 @@ const faceLoginToDB = async (face_image: string, device_id: string) => {
 
 
 const socialSignIn = async (payload: ISocialSignIn) => {
-  console.log(payload);
+
   const isExistUser = await User.findOne({ email: payload.email,appId: payload.appId,isSocial: true });
 
   if(isExistUser){
@@ -344,7 +344,7 @@ const socialSignIn = async (payload: ISocialSignIn) => {
       throw new ApiError(StatusCodes.BAD_REQUEST, 'User already exists with different social type');
     }
     const createToken = jwtHelper.createToken(
-      { id: isExistUser._id, role: isExistUser.role, email: isExistUser.email },
+      { id: isExistUser._id, role: isExistUser.role, email: isExistUser.email,fcmToken:payload?.fcmToken },
       config.jwt.jwt_secret as Secret,
       config.jwt.jwt_expire_in as string
     );
@@ -367,7 +367,7 @@ const socialSignIn = async (payload: ISocialSignIn) => {
     role:USER_ROLES.USER,
   });
   const createToken = jwtHelper.createToken(
-    { id: createUser._id, role: createUser.role, email: createUser.email },
+    { id: createUser._id, role: createUser.role, email: createUser.email,fcmToken:payload?.fcmToken },
     config.jwt.jwt_secret as Secret,
     config.jwt.jwt_expire_in as string
   );
@@ -375,6 +375,14 @@ const socialSignIn = async (payload: ISocialSignIn) => {
     await User.findOneAndUpdate({ _id: createUser._id }, { $addToSet: { fcmTokens: payload.fcmToken } });
   }
   return { accessToken: createToken, role: createUser.role };
+}
+
+const logoutUserFromDB = async (user: JwtPayload) => {
+  const isExistUser = await User.findById(user.id);
+  if (!isExistUser) {
+    throw new ApiError(StatusCodes.BAD_REQUEST, "User doesn't exist!");
+  }
+  await User.findOneAndUpdate({ _id: user.id }, { $pull: { fcmTokens: user.fcmToken } });
 }
 
 export const AuthService = {
@@ -385,5 +393,6 @@ export const AuthService = {
   changePasswordToDB,
   saveFaceDiscriminatorToDB,
   faceLoginToDB,
-  socialSignIn
+  socialSignIn,
+  logoutUserFromDB,
 };
