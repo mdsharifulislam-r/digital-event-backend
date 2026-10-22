@@ -97,6 +97,7 @@ const faceLogin = catchAsync(async (req: Request, res: Response) => {
 
 const socialSignIn = catchAsync(async (req: Request, res: Response) => {
   const { ...socialData } = req.body;
+  socialData.fcmToken =socialData?.token
   const result = await AuthService.socialSignIn(socialData);
   sendResponse(res, {
     success: true,
