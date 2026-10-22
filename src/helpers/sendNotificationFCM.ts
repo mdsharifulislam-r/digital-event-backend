@@ -39,7 +39,7 @@ export const sendNotificationToFCM = async (
   try {
     const messaging = getMessaging(firebaseApp);
     const response = await messaging.sendEachForMulticast(message);
-    console.log('Successfully sent message:', response);
+    console.log('Successfully sent message:', JSON.stringify(response));
   } catch (error) {
     console.error('Error sending message:', error);
   }
