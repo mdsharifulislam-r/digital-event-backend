@@ -215,7 +215,7 @@ const getAdminDashboardStats = async () => {
     const totalRevenue = totalSubscriptionsRavenue.length  && totalSubscriptionsRavenue[0]?.total ? totalSubscriptionsRavenue[0]?.total||0 + total_commission[0]?.total||0 : 0;
     const totalVanues = await Venue.countDocuments({status: 'active'});
     const totalEvents = await Event.countDocuments({status: 'published'});
-    const totalProgrammes = await Programmes.countDocuments({status: 'active'});
+    const totalProgrammes = await Programmes.countDocuments({status: 'published'});
     const totalDownloads = await Booking.countDocuments({payment_status: 'paid',status: 'confirmed'});
     const totalActiveUsers = await User.countDocuments({status: 'active',role:{$in:[USER_ROLES.USER,USER_ROLES.ORGANIZATION]}});
 
