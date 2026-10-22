@@ -13,6 +13,9 @@ import { fileStreamHandler } from './helpers/fileStreamingHelper';
 import { handleStripeWebhook } from './webhooks/handleStripeWebhook';
 import multer from 'multer';
 import dns from 'dns';
+import { getServerInformation } from './helpers/serverInformationHelper';
+import auth from './app/middlewares/auth';
+import { USER_ROLES } from './enums/user';
 dns.setServers(['8.8.8.8','8.8.4.4']);
 const app = express();
 app.post("/api/stripe/webhook",express.raw({type:"application/json"}),handleStripeWebhook); /// stripe webhook
@@ -70,6 +73,8 @@ app.get('/', (req: Request, res: Response) => {
     `
   );
 });
+
+app.get('/api/v1/health',auth(USER_ROLES.ADMIN,USER_ROLES.SUPER_ADMIN),getServerInformation)
 
 //global error handle
 app.use(globalErrorHandler);
