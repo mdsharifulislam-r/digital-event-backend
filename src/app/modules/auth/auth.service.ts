@@ -330,6 +330,7 @@ const faceLoginToDB = async (face_image: string, device_id: string) => {
 
 
 const socialSignIn = async (payload: ISocialSignIn) => {
+  console.log(payload);
   const isExistUser = await User.findOne({ email: payload.email,appId: payload.appId,isSocial: true });
 
   if(isExistUser){
