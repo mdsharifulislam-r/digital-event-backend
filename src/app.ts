@@ -41,7 +41,7 @@ app.use(session({
     secret: "your_secret_key",
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false } // Secure should be true in production with HTTPS
+    cookie: { secure: true, httpOnly: true,path:"/", } // Secure should be true in production with HTTPS
 }));
 app.use(requestIp.mw());
 app.use(limiter);
