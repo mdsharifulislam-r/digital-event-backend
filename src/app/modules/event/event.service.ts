@@ -14,11 +14,15 @@ import { sendActivity } from '../../../handlers/activityHelper';
 import { ACTIVITY_TYPE } from '../../../enums/activity';
 import config from '../../../config';
 import { kafkaProducer } from '../../../tools/kafka/kafka-producers/kafka.producer';
+import { Venue } from '../vanue/vanue.model';
 
 const createEvent = async (data: Partial<IEvent>) => {
   const event = (await Event.create(data))
   if(data.programme){
     await Programmes.findByIdAndUpdate(data.programme, { event_id: event._id });
+  }
+  if(event.vanue){
+    await Venue.findByIdAndUpdate(event.vanue, { $inc: { events_count : 1, ...(event.programme ? { programmes_count: 1 } : {}) } });
   }
   await RedisHelper.keyDelete(`events_all:${data.author}:*`);
   await RedisHelper.keyDelete(`event:${event._id}:*`);
@@ -103,6 +107,9 @@ const updateEvent = async (id: string, data: Partial<IEvent>) => {
 
   if(!data.vanue){
     (data as any).vanue = null
+    if(isExist.vanue){
+      await Venue.findByIdAndUpdate(isExist.vanue, { $inc: { events_count: -1 } });
+    }
   }
 
   if(!data.artist){
@@ -110,6 +117,9 @@ const updateEvent = async (id: string, data: Partial<IEvent>) => {
   }
   if(!data.programme){
     (data as any).programme = null
+    if(isExist.vanue){
+      await Venue.findByIdAndUpdate(isExist.vanue, { $inc: { programmes_count: -1 } });
+    }
   }
   const updatedEvent = await Event.findByIdAndUpdate(id, data, { new: true });
   if (updatedEvent) {
