@@ -46,8 +46,9 @@ const createEvent = catchAsync(async (req: Request, res: Response, next: NextFun
 });
 
 const getEventById = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+
   const id = req.params.id;
-  const result = await EventServices.getEventById(id, req?.user?.id as string|| req?.ip!, req.query?.qrCode === 'true');
+  const result = await EventServices.getEventById(id, req?.user?.id as string|| req?.sessionID!, req.query?.qrCode === 'true');
   sendResponse(res, {
     success: true,
     statusCode: StatusCodes.OK,
