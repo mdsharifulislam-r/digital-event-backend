@@ -78,21 +78,16 @@ export const Event = model<IEvent, EventModel>('Event', eventSchema);
 
 export const qrScanSchema = new Schema<IQrScan, QrScanModel>({
   event: { type: Schema.Types.ObjectId, ref: 'Event', required: true },
-  user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  user: { type:String },
   scannedAt: { type: Date, default: Date.now },
 }, {
   timestamps: true,
 })
 
-qrScanSchema.index({ event: 1, user: 1 }, { unique: true });
 qrScanSchema.statics.recordScan = async function(eventId: Types.ObjectId, userId: Types.ObjectId) {
-  const existingScan = await this.findOne({ event: eventId, user: userId });
-  if (existingScan) {
-    return existingScan;
-  }
-  const newScan = await this.create({ event: eventId, user: userId });
-  await Event.findByIdAndUpdate(eventId, { $inc: { qr_scan_count: 1 } });
-  return newScan;
+  const event = await Event.findByIdAndUpdate(eventId, { $inc: { qr_scan_count: 1 } },{ new: true });
+  await RedisHelper.keyDelete(`event:${eventId}:${userId}:*`);
+  await RedisHelper.keyDelete(`events_all:${event?.author}:*`);
 }
 
 export const QrScan = model<IQrScan, QrScanModel>('QrScan', qrScanSchema);

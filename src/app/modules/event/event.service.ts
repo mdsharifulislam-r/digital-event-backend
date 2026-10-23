@@ -60,6 +60,13 @@ const getEventById = async (id: string,userId:string,qrCode?:boolean) => {
       select: 'title cover_image price_pence is_free',
     }
   ]).lean();
+  let ip = userId;
+  if(qrCode){
+    QrScan.recordScan(event?._id as any, userId as any);
+    if(!Types.ObjectId.isValid(userId)){
+      userId=null as any
+    }
+  }
 
   const isFavorited = await Favorite.countDocuments({ item: id, user: userId, type: "Event" }).lean() > 0;
   
@@ -68,9 +75,6 @@ const getEventById = async (id: string,userId:string,qrCode?:boolean) => {
   const someInterestPeopsle = await Favorite.find({ item: id, type: "Event", user: { $ne: userId }}).limit(3).populate('user', 'name image email followers_count _id').lean();
   (event as any).someInterestPeopsle = someInterestPeopsle.map(fav => fav.user) ||[];
 
-  if(qrCode){
-    QrScan.recordScan(event?._id as any, (event?.author as any)._id as any);
-  }
 
   const isAlreadyProgrammePurchased = await Booking.countDocuments({ programme: event?.programme, user: userId, event: id, payment_status: "paid",isDeleted:{$ne:true} }).lean() > 0;
   (event as any).is_already_programme_purchased = isAlreadyProgrammePurchased;
@@ -84,7 +88,7 @@ const getEventById = async (id: string,userId:string,qrCode?:boolean) => {
     following: await Follower.countDocuments({ follower: userId, following: (event?.author as any)._id }).lean() > 0
   } as any
 
-  await RedisHelper.redisSet(`event:${id}:${userId}`, event, { qrCode });
+  await RedisHelper.redisSet(`event:${id}:${userId||ip}`, event, { qrCode },60);
   return event;
 };
 

@@ -88,7 +88,7 @@ export type ViewsModel = Model<IViews>&{
 
 export type IQrScan ={
   event: Types.ObjectId;
-  user: Types.ObjectId;
+  user: string;
   scannedAt: Date;
 }
 
