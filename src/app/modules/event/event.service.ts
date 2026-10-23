@@ -88,7 +88,7 @@ const getEventById = async (id: string,userId:string,qrCode?:boolean) => {
     following: await Follower.countDocuments({ follower: userId, following: (event?.author as any)._id }).lean() > 0
   } as any
 
-  await RedisHelper.redisSet(`event:${id}:${userId||ip}`, event, { qrCode },60);
+  // await RedisHelper.redisSet(`event:${id}:${userId||ip}`, event, { qrCode },60);
   return event;
 };
 
