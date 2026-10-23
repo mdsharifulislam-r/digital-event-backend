@@ -29,6 +29,12 @@ const createEvent = async (data: Partial<IEvent>) => {
 const getEventById = async (id: string,userId:string,qrCode?:boolean) => {
 
   const cache = await RedisHelper.redisGet(`event:${id}:${userId}`,{ qrCode });
+    if(qrCode){
+    QrScan.recordScan(id as any, userId as any);
+    if(!Types.ObjectId.isValid(userId)){
+      userId=null as any
+    }
+  }
   if (cache) {
     return cache;
   }
@@ -60,13 +66,7 @@ const getEventById = async (id: string,userId:string,qrCode?:boolean) => {
       select: 'title cover_image price_pence is_free',
     }
   ]).lean();
-  let ip = userId;
-  if(qrCode){
-    QrScan.recordScan(event?._id as any, userId as any);
-    if(!Types.ObjectId.isValid(userId)){
-      userId=null as any
-    }
-  }
+
 
   const isFavorited = await Favorite.countDocuments({ item: id, user: userId, type: "Event" }).lean() > 0;
   
@@ -88,7 +88,7 @@ const getEventById = async (id: string,userId:string,qrCode?:boolean) => {
     following: await Follower.countDocuments({ follower: userId, following: (event?.author as any)._id }).lean() > 0
   } as any
 
-  // await RedisHelper.redisSet(`event:${id}:${userId||ip}`, event, { qrCode },60);
+  await RedisHelper.redisSet(`event:${id}`, event,{},60*10);
   return event;
 };
 
