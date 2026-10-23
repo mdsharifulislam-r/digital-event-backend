@@ -28,7 +28,7 @@ const createEvent = async (data: Partial<IEvent>) => {
 
 const getEventById = async (id: string,userId:string,qrCode?:boolean) => {
 
-  const cache = await RedisHelper.redisGet(`event:${id}:${userId}`,{ qrCode });
+  const cache = await RedisHelper.redisGet(`event:${id}:${userId}`,{ });
     if(qrCode){
     QrScan.recordScan(id as any, userId as any);
     if(!Types.ObjectId.isValid(userId)){

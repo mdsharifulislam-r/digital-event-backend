@@ -86,7 +86,6 @@ export const qrScanSchema = new Schema<IQrScan, QrScanModel>({
 
 qrScanSchema.statics.recordScan = async function(eventId: Types.ObjectId, userId: Types.ObjectId) {
   const event = await Event.findByIdAndUpdate(eventId, { $inc: { qr_scan_count: 1 } },{ new: true });
-  await RedisHelper.keyDelete(`event:${eventId}:${userId}:*`);
   await RedisHelper.keyDelete(`events_all:${event?.author}:*`);
 }
 
